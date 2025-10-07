@@ -18,7 +18,7 @@ BackEnd:
 cd backend/
 ```
 
-Após isso, crie o arquivo .env.development.local, insira os pares chave-valor:
+Após isso, crie o arquivo .env, insira os pares chave-valor:
 ```text
 # Database
 DB_HOST=postgres
@@ -26,6 +26,11 @@ DB_PORT=5432
 DB_USERNAME= # Por exemplo: postgres
 DB_PASSWORD= # Por exemplo: postgres
 DB_DATABASE=# Por exemplo: solidarios_db
+
+# JWT
+JWT_SECRET= # Por exemplo: seu_segredo_jwt_aqui
+JWT_EXPIRATION_TIME= #Por exemplo: 15m
+REFRESH_TOKEN_EXPIRATION_DAYS= #Por exemplo: 7
 
 # App
 PORT=3000
