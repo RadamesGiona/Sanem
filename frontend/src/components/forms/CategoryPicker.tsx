@@ -209,7 +209,7 @@ const CategoryPicker: React.FC<CategoryPickerProps> = ({
 
 const styles = StyleSheet.create({
   container: {
-    marginBottom: theme.spacing.m,
+      marginBottom: theme.spacing.s,
   },
   labelContainer: {
     flexDirection: "row",
@@ -220,7 +220,6 @@ const styles = StyleSheet.create({
     marginRight: theme.spacing.xxs,
   },
   categoryList: {
-    maxHeight: 200,
     borderWidth: 1,
     borderColor: theme.colors.neutral.mediumGray,
     borderRadius: theme.borderRadius.medium,
@@ -243,18 +242,18 @@ const styles = StyleSheet.create({
     marginTop: theme.spacing.xxs,
   },
   selectedContainer: {
-    marginTop: theme.spacing.xxl,
+    marginTop: theme.spacing.s,
   },
   selectedLabel: {
     marginBottom: theme.spacing.xxs,
   },
   badgesContainer: {
+    alignItems: "center",
     flexDirection: "row",
     flexWrap: "wrap",
   },
   badge: {
     marginRight: theme.spacing.xs,
-    marginBottom: theme.spacing.xs,
   },
 });
 

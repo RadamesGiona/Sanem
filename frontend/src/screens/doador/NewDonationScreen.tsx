@@ -1,13 +1,13 @@
 // src/screens/doador/NewDonationScreen.tsx
 import React, { useState, useEffect, useCallback } from "react";
 import {
-  View,
-  StyleSheet,
-  Platform,
-  TouchableOpacity,
-  StatusBar,
-  KeyboardAvoidingView,
-  FlatList,
+    View,
+    StyleSheet,
+    Platform,
+    TouchableOpacity,
+    StatusBar,
+    KeyboardAvoidingView,
+    FlatList, ScrollView,
 } from "react-native";
 import { Formik, FormikProps } from "formik";
 import * as Yup from "yup";
@@ -367,13 +367,13 @@ const NewDonationScreen: React.FC = () => {
             onSubmit={handleSubmit}
           >
             {(formikProps) => (
-              <FlatList
-                data={[1]} // Usamos apenas um item para renderizar o conteúdo
-                renderItem={() => renderFormContent(formikProps)}
-                keyExtractor={() => "form"}
-                contentContainerStyle={styles.scrollContent}
-                showsVerticalScrollIndicator={false}
-              />
+                <ScrollView
+                    contentContainerStyle={[styles.scrollContent, { flexGrow: 1 }]}
+                    showsVerticalScrollIndicator={false}
+                    keyboardShouldPersistTaps="handled"
+                >
+                    {renderFormContent(formikProps)}
+                </ScrollView>
             )}
           </Formik>
         </View>
@@ -429,6 +429,7 @@ const styles = StyleSheet.create({
   },
   form: {
     width: "100%",
+    height: "auto",
   },
   formTitle: {
     marginBottom: theme.spacing.xs,
