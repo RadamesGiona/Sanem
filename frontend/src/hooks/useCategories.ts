@@ -40,15 +40,18 @@ export const useCategories = () => {
 
     try {
       const response = await CategoriesService.getAll(pageOptions);
-      setCategories(response.data);
+
       setPagination({
         page: response.meta.page,
-        totalPages: response.meta.pageCount,
-        totalItems: response.meta.itemCount,
+        totalPages: response.meta?.pageCount,
+        totalItems: response.meta?.itemCount,
       });
+
+      setCategories(response.data ?? []);
+
       return response;
     } catch (err: any) {
-      setError(err.message || "Erro ao buscar categorias");
+      setError(err.message || "Não foi possível buscar categorias.");
       return null;
     } finally {
       setIsLoading(false);

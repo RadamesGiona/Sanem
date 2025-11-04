@@ -2,13 +2,9 @@
  * Serviço de categorias - comunicação com as rotas de categorias do backend
  */
 import api from "./api";
-import {
-  Category,
-  CreateCategoryDto,
-  UpdateCategoryDto,
-  CategoriesPage,
-} from "../types/categories.types";
-import { PageOptionsDto } from "../types/common.types";
+import {CategoriesPage, Category, CreateCategoryDto, UpdateCategoryDto,} from "../types/categories.types";
+import {PageOptionsDto} from "../types/common.types";
+import {HttpResponse} from "./types/http.response";
 
 // Namespace para agrupar as funções do serviço
 const CategoriesService = {
@@ -18,10 +14,15 @@ const CategoriesService = {
    * @returns Lista paginada de categorias
    */
   getAll: async (pageOptions?: PageOptionsDto): Promise<CategoriesPage> => {
-    const response = await api.get<CategoriesPage>("/categories", {
+    const response = await api.get<HttpResponse<CategoriesPage>>("/categories", {
       params: pageOptions,
     });
-    return response.data;
+
+    if (response.status !== 200) {
+        throw new Error("Erro ao obter categorias");
+    }
+
+    return response.data.data;
   },
 
   /**

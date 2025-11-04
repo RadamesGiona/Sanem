@@ -56,6 +56,7 @@ const CategoryPicker: React.FC<CategoryPickerProps> = ({
 
   useEffect(() => {
     // Sincronizar o estado local com o valor do Formik para seleção múltipla
+
     if (multiple && Array.isArray(value)) {
       setSelectedIds(value);
     }
@@ -242,7 +243,7 @@ const styles = StyleSheet.create({
     marginTop: theme.spacing.xxs,
   },
   selectedContainer: {
-    marginTop: theme.spacing.s,
+    marginTop: theme.spacing.xxl,
   },
   selectedLabel: {
     marginBottom: theme.spacing.xxs,
