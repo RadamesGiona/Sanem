@@ -149,6 +149,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: theme.borderRadius.medium,
     paddingHorizontal: theme.spacing.xs,
+    paddingVertical: theme.spacing.xs,
     height: 48,
   },
   input: {

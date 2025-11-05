@@ -141,6 +141,8 @@ const NewDonationScreen: React.FC = () => {
           photos: values.photos.map((photo) => photo.uri),
         };
 
+        console.log("Dados do item:", itemData);
+
         // Criar o item
         const newItem = await createItem(itemData);
 
@@ -234,7 +236,7 @@ const NewDonationScreen: React.FC = () => {
             options={conservationStateOptions}
             selectedValue={values.conservationState}
             onSelect={(value) => {
-              setFieldValue("type", value);
+              setFieldValue("conservationState", value);
             }}
             error={
               touched.conservationState && errors.conservationState
