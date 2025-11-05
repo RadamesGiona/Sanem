@@ -29,7 +29,7 @@ services:
       postgres:
         condition: service_healthy
     env_file:
-      - .env.development.local
+      - .env
     restart: unless-stopped
 
 volumes:
