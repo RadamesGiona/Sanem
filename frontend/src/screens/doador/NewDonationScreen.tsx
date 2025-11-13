@@ -44,10 +44,10 @@ interface DonationFormValues {
   size: string;
   categoryId: string;
   photos: Array<{
-    uri: string;
-    name: string;
-    type: string;
-  }>;
+        uri: string;
+        name: string;
+        type: string;
+  }> | null;
 }
 
 // Interface para notificação
@@ -134,12 +134,15 @@ const NewDonationScreen: React.FC = () => {
       }
 
       try {
-        // Adicionar donorId aos valores
-        const itemData: CreateItemDto = {
+
+      const itemData: CreateItemDto = {
           ...values,
           donorId: user.id,
-          photos: values.photos.map((photo) => photo.uri),
-        };
+          photos:
+              values.photos != null && values.photos.length > 0
+                  ? values.photos.map(photo => photo.uri)
+                  : null as any,
+      };
 
         console.log("Dados do item:", itemData);
 

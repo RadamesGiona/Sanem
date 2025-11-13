@@ -87,6 +87,7 @@ export const useItems = () => {
     setError(null);
 
     try {
+
       const data = await ItemsService.create(itemData);
       setItem(data);
       // Atualizar a lista de itens se necessário
