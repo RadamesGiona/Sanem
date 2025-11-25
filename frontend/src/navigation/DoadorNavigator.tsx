@@ -31,7 +31,7 @@ const ProfileIcon = ({ color }: { color: string }) => (
 import MyDonationsScreen from "../screens/doador/MyDonationsScreen";
 import DonationDetailScreen from "../screens/doador/DonationDetailScreen";
 import NewDonationScreen from "../screens/doador/NewDonationScreen";
-import ProfileScreen from "../screens/doador/ProfileScreen";
+import {ProfileScreen} from "../screens/doador/ProfileScreen";
 import EditProfileScreen from "../screens/doador/EditProfileScreen";
 import ImpactScreen from "../screens/doador/ImpactScreen";
 import DonationHistoryScreen from "../screens/doador/DonationHistoryScreen";

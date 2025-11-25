@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import {
-  View,
-  StyleSheet,
-  TouchableOpacity,
-  ScrollView,
-  Alert,
+    View,
+    StyleSheet,
+    TouchableOpacity,
+    ScrollView,
+    Alert, StatusBar, Platform,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
@@ -25,8 +25,11 @@ import theme from "../../theme";
 
 // Hooks
 import { useAuth } from "../../hooks/useAuth";
+import {LinearGradient} from "expo-linear-gradient";
+import Icon from "react-native-vector-icons/Ionicons";
+import FontAwesome6Icon from "react-native-vector-icons/FontAwesome6";
 
-const ProfileScreen: React.FC = () => {
+export const ProfileScreen: React.FC = () => {
   const navigation =
     useNavigation<StackNavigationProp<DoadorProfileStackParamList>>();
   const { user, logout } = useAuth();
@@ -36,31 +39,61 @@ const ProfileScreen: React.FC = () => {
     type: "info" as "success" | "error" | "info" | "warning",
   });
 
-  // Tratar logout
-  const handleLogout = async () => {
-    Alert.alert(
-      "Sair da conta",
-      "Tem certeza que deseja sair?",
-      [
-        { text: "Cancelar", style: "cancel" },
-        {
-          text: "Sair",
-          style: "destructive",
-          onPress: async () => {
-            const success = await logout();
-            if (!success) {
-              setNotification({
-                visible: true,
-                message: "Erro ao sair da conta. Tente novamente.",
-                type: "error",
-              });
-            }
-          },
-        },
-      ],
-      { cancelable: true }
+    const handleCloseBanner = React.useCallback(() => {
+        setNotification((prev) => ({ ...prev, visible: false }));
+    }, []);
+
+    // Componente de cabeçalho comum
+    const Header = () => (
+        <>
+            <StatusBar
+                barStyle="dark-content"
+                backgroundColor="transparent"
+                translucent
+            />
+            <LinearGradient
+                colors={["#b0e6f2", "#e3f7ff", "#ffffff"]}
+                locations={[0, 0.3, 0.6]}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={styles.headerGradient}
+            >
+                <View style={styles.header}>
+                    <View style={styles.welcomeContainer}>
+                        <Typography
+                            variant="h1"
+                            style={styles.welcomeText}
+                            color={theme.colors.primary.main}
+                        >
+                            Meu Perfil
+                        </Typography>
+                    </View>
+                </View>
+            </LinearGradient>
+        </>
     );
-  };
+
+    // Tratar logout
+    const handleLogout = async () => {
+        Alert.alert(
+            "Sair da conta",
+            "Tem certeza que deseja sair?",
+            [ { text: "Cancelar", style: "cancel" },
+              { text: "Sair", style: "destructive",
+                  onPress: async () => {
+                    const success = await logout();
+                    if (!success) {
+                        setNotification({ visible: true,
+                            message: "Erro ao sair da conta. Tente novamente.",
+                            type: "error",
+                        });
+                    }
+                  },
+              },
+            ],
+            { cancelable: true }
+        );
+    };
 
   if (!user) return null;
 
@@ -71,14 +104,11 @@ const ProfileScreen: React.FC = () => {
         visible={notification.visible}
         type={notification.type}
         message={notification.message}
-        onClose={() => setNotification({ ...notification, visible: false })}
+        onClose={handleCloseBanner}
       />
 
       {/* Cabeçalho */}
-      <Header
-        title="Meu Perfil"
-        backgroundColor={theme.colors.primary.secondary}
-      />
+      <Header />
 
       <ScrollView
         style={styles.content}
@@ -131,6 +161,11 @@ const ProfileScreen: React.FC = () => {
             style={styles.menuItem}
             onPress={() => navigation.navigate("EditProfile")}
           >
+              <FontAwesome6Icon name="user"
+                                size={14}
+                                color="#6c7178"
+                                solid
+              />
             <Typography variant="body">Editar Perfil</Typography>
           </TouchableOpacity>
 
@@ -148,6 +183,11 @@ const ProfileScreen: React.FC = () => {
               }
             }}
           >
+            <FontAwesome6Icon name="clipboard-check"
+                              size={14}
+                              color="#6c7178"
+                              solid
+            />
             <Typography variant="body">Histórico de Doações</Typography>
           </TouchableOpacity>
 
@@ -157,6 +197,11 @@ const ProfileScreen: React.FC = () => {
             style={styles.menuItem}
             onPress={() => navigation.navigate("Impact")}
           >
+              <FontAwesome6Icon name="arrow-trend-up"
+                                size={14}
+                                color="#6c7178"
+                                solid
+              />
             <Typography variant="body">Meu Impacto Social</Typography>
           </TouchableOpacity>
         </Card>
@@ -201,6 +246,25 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: theme.colors.neutral.lightGray,
   },
+  headerGradient: {
+  paddingTop:
+    Platform.OS === "ios" ? 60 : 40 + (StatusBar.currentHeight ?? 0),
+    paddingBottom: 20,
+    borderBottomLeftRadius: 20,
+    borderBottomRightRadius: 20,
+    ...theme.shadows.medium,
+  },
+  header: {
+    paddingHorizontal: theme.spacing.m,
+  },
+  welcomeContainer: {
+    marginBottom: theme.spacing.s,
+  },
+  welcomeText: {
+    fontWeight: "bold",
+    fontSize: 28,
+    marginBottom: 5,
+  },
   content: {
     flex: 1,
   },
@@ -235,6 +299,9 @@ const styles = StyleSheet.create({
   },
   menuItem: {
     paddingVertical: theme.spacing.m,
+    flexDirection: "row",
+      alignItems: "center",
+      gap: 10
   },
   statsCard: {
     marginBottom: theme.spacing.m,
@@ -252,4 +319,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ProfileScreen;
+

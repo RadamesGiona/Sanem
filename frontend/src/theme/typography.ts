@@ -96,6 +96,12 @@ export const typography: Record<string, TypographyStyle> = {
     fontWeight: "600",
     color: colors.neutral.white,
   },
+  bodyVariant: {
+    fontSize: 12,
+    fontFamily: fontFamily.primary,
+    fontWeight: "500",
+    color: "#6c7178",
+  }
 };
 
 // Função auxiliar para aplicar estilos de texto
