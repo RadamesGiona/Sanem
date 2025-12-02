@@ -10,7 +10,6 @@ import {
   Animated,
   StatusBar,
   Platform,
-  Text,
 } from "react-native";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";

@@ -3,8 +3,10 @@ import { CreateUserDto } from './create-user.dto';
 import {
   IsEmail,
   IsEnum,
+  IsNotEmpty,
   IsOptional,
   IsString,
+  Matches,
   MinLength,
 } from 'class-validator';
 import { UserRole } from '../entities/user.entity';
@@ -29,4 +31,14 @@ export class UpdateUserDto extends PartialType(CreateUserDto) {
 
   @IsOptional()
   isActive?: boolean;
+
+  @IsOptional()
+  @Matches(/^(?!.*(\d)\1{10})\d{11}$/, {
+    message:
+      'O número de telefone deve conter 11 dígitos e não pode ser uma sequência repetida',
+  })
+  phone?: string;
+
+  @IsOptional()
+  address?: string;
 }

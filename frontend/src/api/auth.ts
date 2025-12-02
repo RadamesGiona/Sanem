@@ -10,6 +10,7 @@ import {
   RefreshTokenDto,
 } from "../types/auth.types";
 import { User } from "../types/users.types";
+import {HttpResponse} from "./types/http.response";
 
 // Namespace para agrupar as funções do serviço
 const AuthService = {
@@ -168,9 +169,9 @@ const AuthService = {
   getProfile: async (): Promise<User> => {
     console.log("[AuthService] Buscando perfil do usuário");
     try {
-      const response = await api.get<User>("/auth/profile");
+      const response = await api.get<HttpResponse<User>>("/auth/profile");
       console.log("[AuthService] Perfil obtido com sucesso:", response.data);
-      return response.data;
+      return response.data.data;
     } catch (error: any) {
       console.error(
         "[AuthService] Erro ao buscar perfil:",

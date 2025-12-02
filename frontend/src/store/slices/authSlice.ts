@@ -1,16 +1,11 @@
 /**
  * Redux slice para gerenciamento do estado de autenticação
  */
-import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
+import {createAsyncThunk, createSlice, PayloadAction} from "@reduxjs/toolkit";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import {
-  LoginDto,
-  RegisterDto,
-  AuthState,
-  LoginResponse,
-  TokensResponse,
-} from "../../types/auth.types";
+import {AuthState, LoginDto, LoginResponse, RegisterDto, TokensResponse,} from "../../types/auth.types";
 import AuthService from "../../api/auth";
+import {User} from "../../types/users.types";
 
 // Estado inicial
 const initialState: AuthState = {
@@ -150,18 +145,17 @@ export const refreshTokens = createAsyncThunk(
   }
 );
 
-export const getProfile = createAsyncThunk(
-  "auth/getProfile",
-  async (_, { rejectWithValue }) => {
-    try {
-      const response = await AuthService.getProfile();
-      return response;
-    } catch (error: any) {
-      return rejectWithValue(
-        error.response?.data?.message || "Erro ao obter perfil"
-      );
+export const getProfile = createAsyncThunk<User>(
+    "auth/getProfile",
+    async (_, { rejectWithValue }) => {
+        try {
+            return await AuthService.getProfile();
+        } catch (error: any) {
+            return rejectWithValue(
+                error.response?.data?.message || "Erro ao obter perfil"
+            );
+        }
     }
-  }
 );
 
 export const restoreAuthState = createAsyncThunk(
@@ -346,6 +340,8 @@ const authSlice = createSlice({
         state.isLoading = true;
       })
       .addCase(getProfile.fulfilled, (state, action) => {
+         console.warn("[authSlice] getProfile.fulfilled", action.payload);
+
         state.isLoading = false;
         state.user = action.payload;
         state.isAuthenticated = true;

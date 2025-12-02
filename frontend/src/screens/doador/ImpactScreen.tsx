@@ -3,13 +3,14 @@ import { View, StyleSheet, ScrollView, ActivityIndicator } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { DoadorProfileStackParamList } from "../../navigation/types";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 // Componentes
 import {
-  Typography,
-  Header,
-  Card,
-  ErrorState,
+    Typography,
+    Header,
+    Card,
+    ErrorState, Divider,
 } from "../../components/barrelComponents";
 import theme from "../../theme";
 
@@ -57,7 +58,7 @@ const ImpactScreen: React.FC = () => {
         // Buscar todos os itens doados pelo usuário
         const response = await fetchItemsByDonor(user.id, {
           page: 1,
-          take: 100,
+          take: 50,
         });
 
         if (response && response.data) {
@@ -137,113 +138,125 @@ const ImpactScreen: React.FC = () => {
   }
 
   return (
-    <View style={styles.container}>
-      <Header
-        title="Meu Impacto Social"
-        onBackPress={() => navigation.goBack()}
-        backgroundColor={theme.colors.primary.secondary}
-      />
-
-      <ScrollView
-        style={styles.content}
-        contentContainerStyle={styles.contentContainer}
+      <SafeAreaView
+          style={styles.safeArea}
+          edges={['top', 'left', 'right']}
       >
-        <Typography variant="h3" style={styles.title}>
-          Seu impacto como doador
-        </Typography>
 
-        <Typography variant="bodySecondary" style={styles.subtitle}>
-          Veja como suas doações estão fazendo a diferença
-        </Typography>
+          <View style={styles.container}>
+              <Header
+                  title="Meu Impacto Social"
+                  onBackPress={() => navigation.goBack()}
+                  backgroundColor={theme.colors.primary.secondary}
+              />
 
-        {loading ? (
-          <View style={styles.loadingContainer}>
-            <ActivityIndicator
-              size="large"
-              color={theme.colors.primary.secondary}
-            />
-            <Typography variant="bodySecondary" style={styles.loadingText}>
-              Carregando suas estatísticas...
-            </Typography>
+              <ScrollView
+                  style={styles.content}
+                  contentContainerStyle={styles.contentContainer}
+              >
+                  <Typography variant="h3" style={styles.title}>
+                      Seu impacto como doador
+                  </Typography>
+
+                  <Typography variant="bodySecondary" style={styles.subtitle}>
+                      Veja como suas doações estão fazendo a diferença
+                  </Typography>
+
+                  {loading ? (
+                      <View style={styles.loadingContainer}>
+                          <ActivityIndicator
+                              size="large"
+                              color={theme.colors.primary.secondary}
+                          />
+                          <Typography variant="bodySecondary" style={styles.loadingText}>
+                              Carregando suas estatísticas...
+                          </Typography>
+                      </View>
+                  ) : (
+                      <>
+                          {/* Card principal de impacto */}
+                          <Card style={styles.impactCard}>
+                              <View style={styles.mainStats}>
+                                  <View style={styles.statItem}>
+                                      <Typography
+                                          variant="h3"
+                                          color={theme.colors.primary.secondary}
+                                      >
+                                          {stats.totalDonations}
+                                      </Typography>
+                                      <Typography variant="bodySecondary" style={{ textAlign: "center" }}>
+                                          {"Doações\nrealizadas"}
+                                      </Typography>
+                                  </View>
+
+                                  <View style={styles.statItem}>
+                                      <Typography
+                                          variant="h3"
+                                          color={theme.colors.primary.secondary}
+                                      >
+                                          {stats.distributedItems}
+                                      </Typography>
+                                      <Typography variant="bodySecondary" style={{ textAlign: "center" }}>
+                                          {"Itens\ndistribuídos"}
+                                      </Typography>
+                                  </View>
+
+                                  <View style={styles.statItem}>
+                                      <Typography
+                                          variant="h3"
+                                          color={theme.colors.primary.secondary}
+                                      >
+                                          {stats.peopleHelped}
+                                      </Typography>
+                                      <Typography variant="bodySecondary" style={{ textAlign: "center" }}>
+                                          {"Pessoas\najudadas"}
+                                      </Typography>
+                                  </View>
+                              </View>
+                          </Card>
+
+                          {/* Detalhes por tipo de item */}
+                          <Card title="Tipos de itens doados" style={styles.detailsCard}>
+                              <View style={styles.detailRow}>
+                                  <Typography variant="bodySecondary">Roupas:</Typography>
+                                  <Typography variant="body">{stats.clothesDonated}</Typography>
+                              </View>
+                              <View style={styles.detailRow}>
+                                  <Typography variant="bodySecondary">Calçados:</Typography>
+                                  <Typography variant="body">{stats.shoesDonated}</Typography>
+                              </View>
+                              <View style={styles.detailRow}>
+                                  <Typography variant="bodySecondary">Utensílios:</Typography>
+                                  <Typography variant="body">{stats.utensilsDonated}</Typography>
+                              </View>
+                              <View style={styles.detailRow}>
+                                  <Typography variant="bodySecondary">Outros:</Typography>
+                                  <Typography variant="body">{stats.othersDonated}</Typography>
+                              </View>
+                          </Card>
+
+                          {/* Mensagem de agradecimento */}
+                          <Card style={styles.messageCard}>
+                              <Typography variant="body" style={styles.messageText}>
+                                  Obrigado por suas doações! Cada item faz a diferença na vida de
+                                  quem precisa.
+                              </Typography>
+                          </Card>
+                      </>
+                  )}
+              </ScrollView>
           </View>
-        ) : (
-          <>
-            {/* Card principal de impacto */}
-            <Card style={styles.impactCard}>
-              <View style={styles.mainStats}>
-                <View style={styles.statItem}>
-                  <Typography
-                    variant="h2"
-                    color={theme.colors.primary.secondary}
-                  >
-                    {stats.totalDonations}
-                  </Typography>
-                  <Typography variant="bodySecondary">
-                    Doações realizadas
-                  </Typography>
-                </View>
 
-                <View style={styles.statItem}>
-                  <Typography
-                    variant="h2"
-                    color={theme.colors.primary.secondary}
-                  >
-                    {stats.distributedItems}
-                  </Typography>
-                  <Typography variant="bodySecondary">
-                    Itens distribuídos
-                  </Typography>
-                </View>
+      </SafeAreaView>
 
-                <View style={styles.statItem}>
-                  <Typography
-                    variant="h2"
-                    color={theme.colors.primary.secondary}
-                  >
-                    {stats.peopleHelped}
-                  </Typography>
-                  <Typography variant="bodySecondary">
-                    Pessoas ajudadas
-                  </Typography>
-                </View>
-              </View>
-            </Card>
-
-            {/* Detalhes por tipo de item */}
-            <Card title="Tipos de itens doados" style={styles.detailsCard}>
-              <View style={styles.detailRow}>
-                <Typography variant="bodySecondary">Roupas:</Typography>
-                <Typography variant="body">{stats.clothesDonated}</Typography>
-              </View>
-              <View style={styles.detailRow}>
-                <Typography variant="bodySecondary">Calçados:</Typography>
-                <Typography variant="body">{stats.shoesDonated}</Typography>
-              </View>
-              <View style={styles.detailRow}>
-                <Typography variant="bodySecondary">Utensílios:</Typography>
-                <Typography variant="body">{stats.utensilsDonated}</Typography>
-              </View>
-              <View style={styles.detailRow}>
-                <Typography variant="bodySecondary">Outros:</Typography>
-                <Typography variant="body">{stats.othersDonated}</Typography>
-              </View>
-            </Card>
-
-            {/* Mensagem de agradecimento */}
-            <Card style={styles.messageCard}>
-              <Typography variant="body" style={styles.messageText}>
-                Obrigado por suas doações! Cada item faz a diferença na vida de
-                quem precisa.
-              </Typography>
-            </Card>
-          </>
-        )}
-      </ScrollView>
-    </View>
   );
 };
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: "#0f0f0f",
+  },
   container: {
     flex: 1,
     backgroundColor: theme.colors.neutral.lightGray,
@@ -277,9 +290,10 @@ const styles = StyleSheet.create({
     padding: theme.spacing.s,
   },
   mainStats: {
+    justifyContent: "space-between",
+    gap: 20,
     flexDirection: "row",
-    justifyContent: "space-around",
-    padding: theme.spacing.m,
+    padding: theme.spacing.xxs,
   },
   statItem: {
     alignItems: "center",

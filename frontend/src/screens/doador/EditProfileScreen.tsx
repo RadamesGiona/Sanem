@@ -24,6 +24,7 @@ import theme from "../../theme";
 // Hooks
 import { useAuth } from "../../hooks/useAuth";
 import { useUsers } from "../../hooks/useUsers";
+import {maskPhone} from "../../utils/authUtils";
 
 // Validação do formulário
 const UpdateProfileSchema = Yup.object().shape({
@@ -31,7 +32,20 @@ const UpdateProfileSchema = Yup.object().shape({
         .min(3, "Nome deve ter pelo menos 3 caracteres")
         .required("Nome é obrigatório"),
     email: Yup.string().email("Email inválido").required("Email é obrigatório"),
-    phone: Yup.string().nullable(),
+    phone: Yup.string()
+        .nullable()
+        .test("valid-phone", "Telefone inválido", value => {
+            if (!value) return true;
+
+            const digits = value.replace(/\D/g, "");
+
+            // Validando tamanho, sequencia e repetição!
+            return (
+                /^\d{11}$/.test(digits) &&
+                !/^(\d)\1{10}$/.test(digits) &&
+                !["12345678901"].includes(digits)
+            );
+        }),
     address: Yup.string().nullable(),
 });
 
@@ -50,7 +64,18 @@ const EditProfileScreen: React.FC = () => {
         if (!user) return;
 
         try {
-            await updateUser(user.id, values);
+
+            if (!values.phone || !values.address) {
+                values = {
+                    ...values,
+                    phone: null,
+                    address: null,
+                };
+            }
+
+            const updated = await updateUser(user.id, values);
+
+            if (!updated) return;
 
             // Atualizar o perfil na store global após edição
             await getProfile();
@@ -139,6 +164,7 @@ const EditProfileScreen: React.FC = () => {
                                   values,
                                   errors,
                                   touched,
+                                  setFieldValue,
                               }) => (
                                 <View style={styles.form}>
                                     <TextField
@@ -162,10 +188,15 @@ const EditProfileScreen: React.FC = () => {
                                     <TextField
                                         label="Telefone"
                                         value={values.phone}
-                                        onChangeText={handleChange("phone")}
                                         onBlur={handleBlur("phone")}
                                         error={touched.phone ? (errors.phone as string) : undefined}
                                         keyboardType="phone-pad"
+                                        scrollEnabled={false}
+                                        multiline={false}
+                                        onChangeText={(text) => {
+                                            const formatted = maskPhone(text);
+                                            void setFieldValue("phone", formatted);
+                                        }}
                                     />
 
                                     <TextField

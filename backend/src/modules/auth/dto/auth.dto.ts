@@ -5,6 +5,7 @@ import {
   MinLength,
   IsOptional,
   IsEnum,
+  Matches,
 } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { UserRole } from '../../users/entities/user.entity';
@@ -57,4 +58,17 @@ export class RegisterDto {
   @IsOptional()
   @IsEnum(UserRole, { message: 'Papel inválido' })
   role?: UserRole;
+
+  @IsNotEmpty({ message: 'O número de telefone é obrigatório' })
+  @IsString({ message: 'O número de telefone deve ser uma string' })
+  @Matches(/^(?!.*(\d)\1{10})\d{11}$/, {
+    message:
+      'O número de telefone deve conter 11 dígitos e não pode ser uma sequência repetida',
+  })
+  phone: string;
+
+  @IsNotEmpty({ message: 'O endereço é obrigatório' })
+  @IsString({ message: 'O endereço deve ser uma string' })
+  address: string;
+
 }

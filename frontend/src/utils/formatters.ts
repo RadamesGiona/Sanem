@@ -241,3 +241,16 @@ export const formatZipCode = (value: string): string => {
 
   return value;
 };
+
+export const formatPhoneNumber = (value: string): string | null => {
+    if (!value) return null;
+
+    // Removendo qualquer caracter não númerico
+    const digits = value.replace(/\D/g, "");
+
+    // Validando sequencia do número, para possível sequência incorreta, garantindo 11 digitos
+    const validRegex = /^(?!.*(\d)\1{10})(?!01234567890)(?!12345678901)(?!09876543210)(?!98765432109)\d{11}$/;
+
+    return validRegex.test(digits) ? digits : null;
+};
+

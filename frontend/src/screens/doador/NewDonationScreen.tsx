@@ -1,13 +1,12 @@
 // src/screens/doador/NewDonationScreen.tsx
-import React, { useState, useEffect, useCallback } from "react";
+import React, {useState, useEffect, useCallback, useRef} from "react";
 import {
     View,
     StyleSheet,
     Platform,
-    TouchableOpacity,
     StatusBar,
     KeyboardAvoidingView,
-    FlatList, ScrollView,
+    ScrollView,
 } from "react-native";
 import { Formik, FormikProps } from "formik";
 import * as Yup from "yup";
@@ -17,13 +16,13 @@ import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 
 // Componentes
 import {
-  Typography,
-  TextField,
-  Select,
-  Button,
-  CategoryPicker,
-  FileUpload,
-  NotificationBanner,
+    Typography,
+    TextField,
+    Select,
+    Button,
+    CategoryPicker,
+    FileUpload,
+    NotificationBanner,
 } from "../../components/barrelComponents";
 import theme from "../../theme";
 
@@ -104,6 +103,41 @@ const conservationStateOptions = [
   { label: "Usado com marcas de uso", value: "Usado com marcas de uso" },
 ];
 
+const Header = () => (
+    <>
+        <StatusBar
+            barStyle="dark-content"
+            backgroundColor="transparent"
+            translucent
+        />
+        <LinearGradient
+            colors={["#b0e6f2", "#e3f7ff", "#ffffff"]}
+            locations={[0, 0.3, 0.6]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={styles.headerGradient}
+        >
+            <View style={styles.header}>
+                <View style={styles.welcomeContainer}>
+                    <Typography
+                        variant="h1"
+                        style={styles.welcomeText}
+                        color={theme.colors.primary.main}
+                    >
+                        Minhas Doações
+                    </Typography>
+                    <Typography
+                        variant="bodySecondary"
+                        color={theme.colors.neutral.darkGray}
+                    >
+                        Doe para quem mais precisa!
+                    </Typography>
+                </View>
+            </View>
+        </LinearGradient>
+    </>
+);
+
 const NewDonationScreen: React.FC = () => {
   const navigation = useNavigation();
   const { user } = useAuth();
@@ -122,7 +156,10 @@ const NewDonationScreen: React.FC = () => {
 
   // Função para lidar com a submissão da nova doação
   const handleSubmit = useCallback(
-    async (values: DonationFormValues): Promise<void> => {
+    async (
+        values: DonationFormValues,
+        { resetForm }: { resetForm: () => void }
+    ): Promise<void> => {
       if (!user) {
         setNotification({
           visible: true,
@@ -161,6 +198,7 @@ const NewDonationScreen: React.FC = () => {
           // Limpar campos e navegar após 2 segundos
           setTimeout(() => {
             setNotification((prev) => ({ ...prev, visible: false }));
+            resetForm();
             navigation.navigate(DOADOR_ROUTES.MY_DONATIONS as never);
           }, 2000);
         }
@@ -298,7 +336,8 @@ const NewDonationScreen: React.FC = () => {
     [isLoading, navigation]
   );
 
-  return (
+
+    return (
     <View style={styles.container}>
       {/* StatusBar e Header com Gradiente */}
       <StatusBar
@@ -306,34 +345,9 @@ const NewDonationScreen: React.FC = () => {
         backgroundColor="transparent"
         translucent
       />
-      <LinearGradient
-        colors={["#b0e6f2", "#e3f7ff", "#ffffff"]}
-        locations={[0, 0.3, 0.6]}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
-        style={styles.headerGradient}
-      >
-        <View style={styles.header}>
-          <TouchableOpacity
-            onPress={() => navigation.goBack()}
-            style={styles.backButton}
-          >
-            <MaterialIcons
-              name="arrow-back"
-              size={24}
-              color={theme.colors.primary.main}
-            />
-          </TouchableOpacity>
-          <View style={styles.headerContent}>
-            <Typography variant="h1" style={styles.headerTitle}>
-              Nova Doação
-            </Typography>
-            <Typography variant="bodySecondary">
-              Olá, {user?.name?.split(" ")[0] || "Doador"}
-            </Typography>
-          </View>
-        </View>
-      </LinearGradient>
+
+      {/* Header */}
+      <Header />
 
       {/* Notificações */}
       <NotificationBanner
@@ -392,19 +406,25 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: theme.colors.neutral.white,
   },
-  headerGradient: {
-    paddingTop:
-      Platform.OS === "ios" ? 60 : 40 + (StatusBar.currentHeight ?? 0),
-    paddingBottom: 20,
-    borderBottomLeftRadius: 20,
-    borderBottomRightRadius: 20,
-    ...theme.shadows.medium,
-  },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: theme.spacing.m,
-  },
+    headerGradient: {
+        paddingTop:
+            Platform.OS === "ios" ? 60 : 40 + (StatusBar.currentHeight ?? 0),
+        paddingBottom: 20,
+        borderBottomLeftRadius: 20,
+        borderBottomRightRadius: 20,
+        ...theme.shadows.medium,
+    },
+    header: {
+        paddingHorizontal: theme.spacing.m,
+    },
+    welcomeContainer: {
+        marginBottom: theme.spacing.s,
+    },
+    welcomeText: {
+        fontWeight: "bold",
+        fontSize: 28,
+        marginBottom: 5,
+    },
   backButton: {
     padding: theme.spacing.xs,
     marginRight: theme.spacing.xs,
