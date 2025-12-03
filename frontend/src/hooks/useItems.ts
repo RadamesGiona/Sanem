@@ -229,18 +229,19 @@ export const useItems = () => {
 
   // Função para obter itens por status
   const fetchItemsByStatus = useCallback(
-    async (status: ItemStatus, pageOptions?: PageOptionsDto) => {
+    async (status?: ItemStatus | null, pageOptions?: PageOptionsDto) => {
       setIsLoading(true);
       setError(null);
 
       try {
-        const response = await ItemsService.getByStatus(status, pageOptions);
+        const response = await ItemsService.getByStatus(status ?? null, pageOptions);
         setItems(response.data);
         setPagination({
           page: response.meta.page,
           totalPages: response.meta.pageCount,
           totalItems: response.meta.itemCount,
         });
+
         return response;
       } catch (err: any) {
         setError(err.message || "Erro ao buscar itens por status");

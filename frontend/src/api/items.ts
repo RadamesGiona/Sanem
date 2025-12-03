@@ -10,6 +10,7 @@ import {
   ItemsApiResponse,
 } from "../types/items.types";
 import { PageOptionsDto } from "../types/common.types";
+import {HttpResponse} from "./types/http.response";
 
 // Namespace para agrupar as funções do serviço
 const ItemsService = {
@@ -111,13 +112,16 @@ const ItemsService = {
    * @returns Lista paginada de itens
    */
   getByStatus: async (
-    status: string,
+    status: string | null,
     pageOptions?: PageOptionsDto
   ): Promise<ItemsPage> => {
-    const response = await api.get<ItemsPage>(`/items/status/${status}`, {
+
+    const uri: string = status ? `/items?status=${status}` : "/items";
+    const response= await api.get<HttpResponse<ItemsPage>>(`${uri}`, {
       params: pageOptions,
     });
-    return response.data;
+
+    return response.data.data;
   },
 
   /**

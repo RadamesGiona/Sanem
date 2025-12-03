@@ -36,6 +36,8 @@ export interface UpdateUserDto {
   password?: string;
   role?: UserRole;
   isActive?: boolean;
+  phone?: string;
+  address?: string;
 }
 
 // Tipo para a resposta paginada

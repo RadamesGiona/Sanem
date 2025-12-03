@@ -26,6 +26,7 @@ import { AuthStackParamList } from "../../navigation/AuthNavigator";
 import { AUTH_ROUTES } from "../../navigation/routes";
 import { UserRole } from "../../types/users.types";
 import { maskPhone } from "../../utils/authUtils";
+import {formatPhoneNumber} from "../../utils/formatters";
 
 // Esquema de validação
 const RegisterSchema = Yup.object().shape({
@@ -163,6 +164,8 @@ const RegisterScreen: React.FC = () => {
       email: registerData.email.trim().toLowerCase(),
       password: registerData.password,
       role: registerData.role,
+      phone: formatPhoneNumber(phone),
+      address: address.trim(),
     };
 
     console.log("[RegisterScreen] Dados sendo enviados:", {

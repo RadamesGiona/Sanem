@@ -24,7 +24,9 @@ import theme from "../../theme";
 // Hooks
 import { useAuth } from "../../hooks/useAuth";
 import { useUsers } from "../../hooks/useUsers";
-import {maskPhone} from "../../utils/authUtils";
+import { maskPhone } from "../../utils/authUtils";
+import {UpdateUserDto} from "../../types/users.types";
+import {formatPhone} from "../../utils/formatters";
 
 // Validação do formulário
 const UpdateProfileSchema = Yup.object().shape({
@@ -73,7 +75,14 @@ const EditProfileScreen: React.FC = () => {
                 };
             }
 
-            const updated = await updateUser(user.id, values);
+            const userData: UpdateUserDto = {
+                ...values,
+                phone: values.phone ? formatPhone(values.phone) : null,
+            }
+
+            console.log(values);
+
+            const updated = await updateUser(user.id, userData);
 
             if (!updated) return;
 

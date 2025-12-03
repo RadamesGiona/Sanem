@@ -36,6 +36,7 @@ import { useItems } from "../../hooks/useItems";
 import { Item, ItemStatus } from "../../types/items.types";
 import { DOADOR_ROUTES } from "../../navigation/routes";
 import { Order } from "../../types/common.types";
+import {PrincipalHeader} from "../../components/common/PrincipalHeader";
 
 // Filtros de status
 const STATUS_FILTERS = [
@@ -177,47 +178,11 @@ const MyDonationsScreen: React.FC = () => {
     }
   };
 
-  // Componente de cabeçalho comum
-  const Header = () => (
-    <>
-      <StatusBar
-        barStyle="dark-content"
-        backgroundColor="transparent"
-        translucent
-      />
-      <LinearGradient
-        colors={["#b0e6f2", "#e3f7ff", "#ffffff"]}
-        locations={[0, 0.3, 0.6]}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
-        style={styles.headerGradient}
-      >
-        <View style={styles.header}>
-          <View style={styles.welcomeContainer}>
-            <Typography
-              variant="h1"
-              style={styles.welcomeText}
-              color={theme.colors.primary.main}
-            >
-              Minhas Doações
-            </Typography>
-            <Typography
-              variant="bodySecondary"
-              color={theme.colors.neutral.darkGray}
-            >
-              Olá, {user?.name?.split(" ")[0] || "Doador"}
-            </Typography>
-          </View>
-        </View>
-      </LinearGradient>
-    </>
-  );
-
   // Estado de carregamento inicial
   if (isLoading && !dataLoaded && !refreshing) {
     return (
       <View style={styles.container}>
-        <Header />
+        <PrincipalHeader title="Minhas Doações" />
         <View style={styles.loadingContainer}>
           <Loading visible={true} message="Buscando suas doações..." />
         </View>
@@ -229,7 +194,7 @@ const MyDonationsScreen: React.FC = () => {
   if (error) {
     return (
       <View style={styles.container}>
-        <Header />
+        <PrincipalHeader title="Minhas Doações" />
         <View style={styles.content}>
           <ErrorState
             title="Erro ao carregar doações"
@@ -282,7 +247,7 @@ const MyDonationsScreen: React.FC = () => {
   // UI principal
   return (
     <View style={styles.container}>
-      <Header />
+      <PrincipalHeader title="Minhas Doações" subtitle={"Olá " + user?.name} />
 
       {/* Conteúdo */}
       <View style={styles.content}>

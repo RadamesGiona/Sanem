@@ -97,7 +97,7 @@ const Badge: React.FC<BadgeProps> = ({
 
 const styles = StyleSheet.create({
   container: {
-    borderRadius: 16,
+    borderRadius: 8,
     paddingHorizontal: theme.spacing.xs,
     alignItems: "center",
     justifyContent: "center",

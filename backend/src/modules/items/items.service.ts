@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Item } from './entities/item.entity';
+import { Item, ItemStatus } from './entities/item.entity';
 import { CreateItemDto } from './dto/create-item.dto';
 import { UpdateItemDto } from './dto/update-item.dto';
 import { UsersService } from '../users/users.service';
@@ -85,16 +85,27 @@ export class ItemsService {
   @LogMethod()
   async findAllPaginated(
     pageOptionsDto: PageOptionsDto,
+    status?: ItemStatus,
   ): Promise<PageDto<Item>> {
     this.logger.debug(
-      `Buscando itens paginados - página ${pageOptionsDto.page}`,
+      `Buscando itens paginados - página ${pageOptionsDto.page}${status ? ` - status: ${status}` : ''}`,
     );
+
+    console.log('item status: ' + status);
 
     try {
       const queryBuilder = this.itemsRepository
         .createQueryBuilder('item')
         .leftJoinAndSelect('item.donor', 'donor')
-        .leftJoinAndSelect('item.category', 'category')
+        .leftJoinAndSelect('item.category', 'category');
+
+      // Filtro por status (opcional)
+      if (status) {
+        queryBuilder.andWhere('item.status = :status', { status });
+      }
+
+      // Adicionando a paginação
+      queryBuilder
         .orderBy('item.receivedDate', pageOptionsDto.order)
         .skip(pageOptionsDto.skip)
         .take(pageOptionsDto.take);

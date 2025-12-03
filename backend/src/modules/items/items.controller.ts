@@ -1,18 +1,20 @@
 // src/modules/items/items.controller.ts
 import {
-  Controller,
-  Get,
-  Post,
   Body,
-  Patch,
-  Param,
+  Controller,
+  DefaultValuePipe,
   Delete,
+  Get,
+  Param,
+  ParseIntPipe,
+  ParseUUIDPipe,
+  Patch,
+  Post,
+  Query,
+  Request,
+  UseGuards,
   UsePipes,
   ValidationPipe,
-  ParseUUIDPipe,
-  UseGuards,
-  Request,
-  Query,
 } from '@nestjs/common';
 import { ItemsService } from './items.service';
 import { CreateItemDto } from './dto/create-item.dto';
@@ -22,15 +24,15 @@ import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { UserRole } from '../users/entities/user.entity';
 import {
-  ApiTags,
-  ApiOperation,
-  ApiResponse,
   ApiBearerAuth,
+  ApiOperation,
   ApiQuery,
+  ApiResponse,
+  ApiTags,
 } from '@nestjs/swagger';
 import { PageOptionsDto } from '../../common/pagination/dto/page-options.dto';
 import { PageDto } from '../../common/pagination/dto/page.dto';
-import { Item } from './entities/item.entity';
+import { Item, ItemStatus } from './entities/item.entity';
 
 @ApiTags('items')
 @Controller('items')
@@ -63,9 +65,31 @@ export class ItemsController {
     required: false,
     description: 'Opções de paginação',
   })
-  @Roles(UserRole.ADMIN, UserRole.FUNCIONARIO) // Apenas Admin e Funcionário podem listar todos
-  findAll(@Query() pageOptionsDto: PageOptionsDto): Promise<PageDto<Item>> {
-    return this.itemsService.findAllPaginated(pageOptionsDto);
+  @ApiQuery({
+    name: 'status',
+    required: false,
+    enum: ItemStatus,
+    description: 'Filtrar por status do item',
+  })
+  @Roles(
+    UserRole.ADMIN,
+    UserRole.FUNCIONARIO,
+    UserRole.DOADOR,
+    UserRole.BENEFICIARIO,
+  ) // Apenas os Usuarios logados podem ver todos os itens
+  findAll(
+    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
+    @Query('take', new DefaultValuePipe(10), ParseIntPipe) take: number,
+    @Query('order', new DefaultValuePipe('DESC')) order: 'ASC' | 'DESC',
+    @Query('status') status?: ItemStatus,
+  ): Promise<PageDto<Item>> {
+    const pageOptionsDto = {
+      page,
+      take,
+      order,
+      skip: (page - 1) * take,
+    } as PageOptionsDto;
+    return this.itemsService.findAllPaginated(pageOptionsDto, status);
   }
 
   @Get('donor/:donorId')
