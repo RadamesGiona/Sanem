@@ -1,5 +1,6 @@
 // src/modules/items/items.controller.ts
 import {
+  BadRequestException,
   Body,
   Controller,
   DefaultValuePipe,
@@ -12,7 +13,9 @@ import {
   Post,
   Query,
   Request,
+  UploadedFile,
   UseGuards,
+  UseInterceptors,
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
@@ -33,13 +36,18 @@ import {
 import { PageOptionsDto } from '../../common/pagination/dto/page-options.dto';
 import { PageDto } from '../../common/pagination/dto/page.dto';
 import { Item, ItemStatus } from './entities/item.entity';
+import { ImageStorageService } from '../image-storage/image.storage.service';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @ApiTags('items')
 @Controller('items')
 @UseGuards(JwtAuthGuard, RolesGuard) // Proteger todas as rotas e verificar roles
 @ApiBearerAuth() // Indica que precisa de token JWT para todos os endpoints
 export class ItemsController {
-  constructor(private readonly itemsService: ItemsService) {}
+  constructor(
+    private readonly itemsService: ItemsService,
+    private readonly imageStorageService: ImageStorageService,
+  ) {}
 
   @Post()
   @ApiOperation({ summary: 'Criar um novo item/doação' })
@@ -49,8 +57,26 @@ export class ItemsController {
   @ApiResponse({ status: 404, description: 'Doador não encontrado.' })
   @Roles(UserRole.ADMIN, UserRole.FUNCIONARIO, UserRole.DOADOR) // Admin, Funcionário ou o próprio Doador podem criar
   @UsePipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }))
-  create(@Body() createItemDto: CreateItemDto, @Request() req) {
-    return this.itemsService.create(createItemDto, req.user); // Passa o usuário logado
+  @UseInterceptors(FileInterceptor('image'))
+  async create(
+    @Body() createItemDto: CreateItemDto,
+    @Request() req,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
+    let imageUrl: string | undefined = undefined;
+
+    if (file) {
+      imageUrl = await this.imageStorageService.upload(
+        file.buffer,
+        file.originalname,
+        file.mimetype,
+      );
+    }
+
+    if (!imageUrl)
+      throw new BadRequestException('Você precisa enviar uma imagem');
+
+    return this.itemsService.create(createItemDto, req.user, [imageUrl]);
   }
 
   @Get()

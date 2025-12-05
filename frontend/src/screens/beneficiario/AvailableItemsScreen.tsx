@@ -107,6 +107,7 @@ const AvailableItemsScreen: React.FC = () => {
         if (item.photos && Array.isArray(item.photos) && item.photos.length > 0) {
             return item.photos[0];
         }
+
         return null;
     };
 
@@ -160,11 +161,6 @@ const AvailableItemsScreen: React.FC = () => {
                                 style={styles.itemImage}
                                 resizeMode="cover"
                             />
-                            {/* Overlay gradient */}
-                            <LinearGradient
-                                colors={['transparent', 'rgba(0,0,0,0.7)']}
-                                style={styles.imageOverlay}
-                            />
                         </>
                     ) : (
                         <LinearGradient
@@ -187,10 +183,10 @@ const AvailableItemsScreen: React.FC = () => {
                     )}
 
                     {/* Badge de Status no canto superior */}
-                    <LinearGradient
+                    * <LinearGradient
                         colors={getStatusColor(item.status)}
-                        start={{ x: 0, y: 0 }}
-                        end={{ x: 1, y: 0 }}
+                        start={{x: 0, y: 0}}
+                        end={{x: 1, y: 0}}
                         style={styles.statusBadge}
                     >
                         <Typography
@@ -489,6 +485,8 @@ const styles = StyleSheet.create({
     },
     cardContent: {
         padding: theme.spacing.s,
+        flex: 1,
+        justifyContent: 'space-between',
     },
     itemDescription: {
         fontWeight: '600',

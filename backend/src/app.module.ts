@@ -31,16 +31,16 @@ import {
   CsrfProtectionMiddleware,
   SameOriginMiddleware,
 } from './common/middleware/csrf.middleware';
+import { LoggingModule } from './common/logging/logging.module';
+import { TypeOrmLoggerService } from './common/logging/typeorm-logger';
+import { typeOrmSharedConfig } from './config/typeorm.shared';
+import { ImageStorageModule } from './modules/image-storage/image.storage.module';
+import { RequestLoggingMiddleware } from './common/middleware/request-logging.middleware';
+import helmet from 'helmet';
+import * as cookieParser from 'cookie-parser';
+import { GlobalExceptionFilter } from './common/filters/global-exception.filter';
 
 // Novo Módulo de Logging e Filtros
-import { LoggingModule } from './common/logging/logging.module';
-import { GlobalExceptionFilter } from './common/filters/global-exception.filter';
-import { TypeOrmLoggerService } from './common/logging/typeorm-logger';
-import { RequestLoggingMiddleware } from './common/middleware/request-logging.middleware';
-
-import * as cookieParser from 'cookie-parser';
-import helmet from 'helmet';
-import { typeOrmSharedConfig } from './config/typeorm.shared';
 
 @Module({
   imports: [
@@ -77,6 +77,7 @@ import { typeOrmSharedConfig } from './config/typeorm.shared';
     ItemsModule,
     InventoryModule,
     DistributionsModule,
+    ImageStorageModule,
   ],
   controllers: [AppController],
   providers: [

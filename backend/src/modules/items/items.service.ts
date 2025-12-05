@@ -29,7 +29,11 @@ export class ItemsService {
   }
 
   @LogMethod()
-  async create(createItemDto: CreateItemDto, currentUser: User): Promise<Item> {
+  async create(
+    createItemDto: CreateItemDto,
+    currentUser: User,
+    imagesUrls: string[],
+  ): Promise<Item> {
     this.logger.log(
       `Criando novo item com doador ID: ${createItemDto.donorId}`,
     );
@@ -63,6 +67,7 @@ export class ItemsService {
 
       const item = this.itemsRepository.create({
         ...createItemDto,
+        photos: imagesUrls,
         donor: donor,
       });
 

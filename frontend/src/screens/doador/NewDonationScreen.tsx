@@ -147,8 +147,6 @@ const NewDonationScreen: React.FC = () => {
                   : null as any,
       };
 
-        console.log("Dados do item:", itemData);
-
         // Criar o item
         const newItem = await createItem(itemData);
 
