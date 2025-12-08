@@ -116,12 +116,9 @@ const ItemCard: React.FC<ItemCardProps> = ({
             <Typography variant="small" color={theme.colors.neutral.darkGray}>
               Categoria:
             </Typography>
-            <Badge
-              label={item.category.name}
-              variant="info"
-              size="small"
-              style={styles.categoryBadge}
-            />
+            <Typography variant="small">
+                {item.category.name}
+            </Typography>
           </View>
         )}
       </View>
@@ -177,6 +174,7 @@ const styles = StyleSheet.create({
     height: 80,
     borderRadius: theme.borderRadius.small,
     marginRight: theme.spacing.s,
+    alignSelf: "center",
   },
   detailsContainer: {
     flex: 1,

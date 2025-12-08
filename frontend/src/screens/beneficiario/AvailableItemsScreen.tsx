@@ -105,6 +105,8 @@ const AvailableItemsScreen: React.FC = () => {
     // Função para obter a primeira foto ou null
     const getItemPhoto = (item: Item) => {
         if (item.photos && Array.isArray(item.photos) && item.photos.length > 0) {
+
+            console.log(item.photos);
             return item.photos[0];
         }
 
@@ -183,7 +185,7 @@ const AvailableItemsScreen: React.FC = () => {
                     )}
 
                     {/* Badge de Status no canto superior */}
-                    * <LinearGradient
+                    <LinearGradient
                         colors={getStatusColor(item.status)}
                         start={{x: 0, y: 0}}
                         end={{x: 1, y: 0}}

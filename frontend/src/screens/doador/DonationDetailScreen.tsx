@@ -16,6 +16,7 @@ import {
 } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { DoadorStackParamList } from "../../navigation/types";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 // Componentes
 import {
@@ -191,226 +192,235 @@ const DonationDetailScreen: React.FC = () => {
   };
 
   return (
-    <View style={styles.container}>
-      {/* Cabeçalho */}
-      <Header
-        title="Detalhes da Doação"
-        onBackPress={() => navigation.goBack()}
-        backgroundColor={theme.colors.primary.secondary}
-      />
-
-      {/* Notificação */}
-      <NotificationBanner
-        visible={notification.visible}
-        type={notification.type}
-        message={notification.message}
-        description={notification.description}
-        onClose={() => setNotification({ ...notification, visible: false })}
-      />
-
-      <ScrollView
-        style={styles.content}
-        contentContainerStyle={styles.contentContainer}
+      <SafeAreaView
+          style={styles.safeArea}
+          edges={['top', 'left', 'right']}
       >
-        {/* Galeria de imagens */}
-        <View style={styles.imageContainer}>
-          {item.photos && item.photos.length > 0 ? (
-            <>
-              <Image
-                source={{ uri: item.photos[currentImage] }}
-                style={styles.mainImage}
-                resizeMode="cover"
-              />
-              {item.photos.length > 1 && (
-                <ScrollView
-                  horizontal
-                  showsHorizontalScrollIndicator={false}
-                  style={styles.thumbnailContainer}
-                >
-                  {item.photos.map((photo, index) => (
-                    <TouchableOpacity
-                      key={index}
-                      onPress={() => setCurrentImage(index)}
-                      style={[
-                        styles.thumbnail,
-                        currentImage === index && styles.selectedThumbnail,
-                      ]}
-                    >
-                      <Image
-                        source={{ uri: photo }}
-                        style={styles.thumbnailImage}
-                        resizeMode="cover"
-                      />
-                    </TouchableOpacity>
-                  ))}
-                </ScrollView>
-              )}
-            </>
-          ) : (
-            <View style={styles.noImageContainer}>
-              <Typography
-                variant="bodySecondary"
-                color={theme.colors.neutral.darkGray}
-              >
-                Sem imagens disponíveis
-              </Typography>
-            </View>
-          )}
-        </View>
-
-        {/* Informações básicas */}
-        <Card style={styles.card}>
-          <View style={styles.headerRow}>
-            <Badge
-              label={itemTypeLabels[item.type]}
-              variant="info"
-              size="medium"
-            />
-            <StatusIndicator status={item.status} showLabel />
-          </View>
-
-          <Typography variant="h3" style={styles.title}>
-            {item.description}
-          </Typography>
-
-          <Divider spacing={theme.spacing.s} />
-
-          {/* Detalhes do item */}
-          <View style={styles.detailsContainer}>
-            {item.size && (
-              <View style={styles.detailRow}>
-                <Typography
-                  variant="bodySecondary"
-                  color={theme.colors.neutral.darkGray}
-                >
-                  Tamanho:
-                </Typography>
-                <Typography variant="body">{item.size}</Typography>
-              </View>
-            )}
-
-            {item.conservationState && (
-              <View style={styles.detailRow}>
-                <Typography
-                  variant="bodySecondary"
-                  color={theme.colors.neutral.darkGray}
-                >
-                  Estado de conservação:
-                </Typography>
-                <Typography variant="body">{item.conservationState}</Typography>
-              </View>
-            )}
-
-            <View style={styles.detailRow}>
-              <Typography
-                variant="bodySecondary"
-                color={theme.colors.neutral.darkGray}
-              >
-                Data de doação:
-              </Typography>
-              <Typography variant="body">
-                {formatDate(item.receivedDate)}
-              </Typography>
-            </View>
-
-            {item.category && (
-              <View style={styles.detailRow}>
-                <Typography
-                  variant="bodySecondary"
-                  color={theme.colors.neutral.darkGray}
-                >
-                  Categoria:
-                </Typography>
-                <Badge label={item.category.name} variant="info" size="small" />
-              </View>
-            )}
-          </View>
-        </Card>
-
-        {/* Status da doação */}
-        <Card title="Status da Doação" style={styles.card}>
-          <View style={styles.statusTimeline}>
-            <View style={styles.statusItem}>
-              <View style={[styles.statusDot, styles.statusDotActive]} />
-              <View style={styles.statusContent}>
-                <Typography variant="bodySecondary" style={styles.statusTitle}>
-                  Doação Recebida
-                </Typography>
-                <Typography
-                  variant="small"
-                  color={theme.colors.neutral.darkGray}
-                >
-                  {formatDate(item.receivedDate)}
-                </Typography>
-              </View>
-            </View>
-
-            <View style={styles.statusItem}>
-              <View
-                style={[
-                  styles.statusDot,
-                  item.status !== "disponivel" && styles.statusDotActive,
-                ]}
-              />
-              <View style={styles.statusContent}>
-                <Typography variant="bodySecondary" style={styles.statusTitle}>
-                  {item.status === "reservado" || item.status === "distribuido"
-                    ? "Reservado para Beneficiário"
-                    : "Aguardando Reserva"}
-                </Typography>
-                {(item.status === "reservado" ||
-                  item.status === "distribuido") && (
-                  <Typography
-                    variant="small"
-                    color={theme.colors.neutral.darkGray}
-                  >
-                    Item reservado para distribuição
-                  </Typography>
-                )}
-              </View>
-            </View>
-
-            <View style={styles.statusItem}>
-              <View
-                style={[
-                  styles.statusDot,
-                  item.status === "distribuido" && styles.statusDotActive,
-                ]}
-              />
-              <View style={styles.statusContent}>
-                <Typography variant="bodySecondary" style={styles.statusTitle}>
-                  {item.status === "distribuido"
-                    ? "Entregue ao Beneficiário"
-                    : "Aguardando Entrega"}
-                </Typography>
-                {item.status === "distribuido" && (
-                  <Typography
-                    variant="small"
-                    color={theme.colors.neutral.darkGray}
-                  >
-                    Sua doação foi entregue a quem precisava!
-                  </Typography>
-                )}
-              </View>
-            </View>
-          </View>
-        </Card>
-
-        {/* Ações disponíveis */}
-        {isOwner && item.status === "disponivel" && (
-          <Button
-            title="Cancelar Doação"
-            onPress={handleCancelDonation}
-            variant="secondary"
-            style={styles.actionButton}
+        <View style={styles.container}>
+          {/* Cabeçalho */}
+          <Header
+            title="Detalhes da Doação"
+            onBackPress={() => navigation.goBack()}
+            backgroundColor={theme.colors.primary.secondary}
           />
-        )}
-      </ScrollView>
-    </View>
+
+          {/* Notificação */}
+          <NotificationBanner
+            visible={notification.visible}
+            type={notification.type}
+            message={notification.message}
+            description={notification.description}
+            onClose={() => setNotification({ ...notification, visible: false })}
+          />
+
+          <ScrollView
+            style={styles.content}
+            contentContainerStyle={styles.contentContainer}
+          >
+            {/* Galeria de imagens */}
+            <View style={styles.imageContainer}>
+              {item.photos && item.photos.length > 0 ? (
+                <>
+                  <Image
+                    source={{ uri: item.photos[currentImage] }}
+                    style={styles.mainImage}
+                    resizeMode="cover"
+                  />
+                  {item.photos.length > 1 && (
+                    <ScrollView
+                      horizontal
+                      showsHorizontalScrollIndicator={false}
+                      style={styles.thumbnailContainer}
+                    >
+                      {item.photos.map((photo, index) => (
+                        <TouchableOpacity
+                          key={index}
+                          onPress={() => setCurrentImage(index)}
+                          style={[
+                            styles.thumbnail,
+                            currentImage === index && styles.selectedThumbnail,
+                          ]}
+                        >
+                          <Image
+                            source={{ uri: photo }}
+                            style={styles.thumbnailImage}
+                            resizeMode="cover"
+                          />
+                        </TouchableOpacity>
+                      ))}
+                    </ScrollView>
+                  )}
+                </>
+              ) : (
+                <View style={styles.noImageContainer}>
+                  <Typography
+                    variant="bodySecondary"
+                    color={theme.colors.neutral.darkGray}
+                  >
+                    Sem imagens disponíveis
+                  </Typography>
+                </View>
+              )}
+            </View>
+
+            {/* Informações básicas */}
+            <Card style={styles.card}>
+              <View style={styles.headerRow}>
+                <Badge
+                  label={itemTypeLabels[item.type]}
+                  variant="info"
+                  size="medium"
+                />
+                <StatusIndicator status={item.status} showLabel />
+              </View>
+
+              <Typography variant="h3" style={styles.title}>
+                {item.description}
+              </Typography>
+
+              <Divider spacing={theme.spacing.s} />
+
+              {/* Detalhes do item */}
+              <View style={styles.detailsContainer}>
+                {item.size && (
+                  <View style={styles.detailRow}>
+                    <Typography
+                      variant="bodySecondary"
+                      color={theme.colors.neutral.darkGray}
+                    >
+                      Tamanho:
+                    </Typography>
+                    <Typography variant="body">{item.size}</Typography>
+                  </View>
+                )}
+
+                {item.conservationState && (
+                  <View style={styles.detailRow}>
+                    <Typography
+                      variant="bodySecondary"
+                      color={theme.colors.neutral.darkGray}
+                    >
+                      Estado de conservação:
+                    </Typography>
+                    <Typography variant="body">{item.conservationState}</Typography>
+                  </View>
+                )}
+
+                <View style={styles.detailRow}>
+                  <Typography
+                    variant="bodySecondary"
+                    color={theme.colors.neutral.darkGray}
+                  >
+                    Data de doação:
+                  </Typography>
+                  <Typography variant="body">
+                    {formatDate(item.receivedDate)}
+                  </Typography>
+                </View>
+
+                {item.category && (
+                  <View style={styles.detailRow}>
+                    <Typography
+                      variant="bodySecondary"
+                      color={theme.colors.neutral.darkGray}
+                    >
+                      Categoria:
+                    </Typography>
+                    <Badge label={item.category.name} variant="info" size="small" />
+                  </View>
+                )}
+              </View>
+            </Card>
+
+            {/* Status da doação */}
+            <Card title="Status da Doação" style={styles.card}>
+              <View style={styles.statusTimeline}>
+                <View style={styles.statusItem}>
+                  <View style={[styles.statusDot, styles.statusDotActive]} />
+                  <View style={styles.statusContent}>
+                    <Typography variant="bodySecondary" style={styles.statusTitle}>
+                      Doação Recebida
+                    </Typography>
+                    <Typography
+                      variant="small"
+                      color={theme.colors.neutral.darkGray}
+                    >
+                      {formatDate(item.receivedDate)}
+                    </Typography>
+                  </View>
+                </View>
+
+                <View style={styles.statusItem}>
+                  <View
+                    style={[
+                      styles.statusDot,
+                      item.status !== "disponivel" && styles.statusDotActive,
+                    ]}
+                  />
+                  <View style={styles.statusContent}>
+                    <Typography variant="bodySecondary" style={styles.statusTitle}>
+                      {item.status === "reservado" || item.status === "distribuido"
+                        ? "Reservado para Beneficiário"
+                        : "Aguardando Reserva"}
+                    </Typography>
+                    {(item.status === "reservado" ||
+                      item.status === "distribuido") && (
+                      <Typography
+                        variant="small"
+                        color={theme.colors.neutral.darkGray}
+                      >
+                        Item reservado para distribuição
+                      </Typography>
+                    )}
+                  </View>
+                </View>
+
+                <View style={styles.statusItem}>
+                  <View
+                    style={[
+                      styles.statusDot,
+                      item.status === "distribuido" && styles.statusDotActive,
+                    ]}
+                  />
+                  <View style={styles.statusContent}>
+                    <Typography variant="bodySecondary" style={styles.statusTitle}>
+                      {item.status === "distribuido"
+                        ? "Entregue ao Beneficiário"
+                        : "Aguardando Entrega"}
+                    </Typography>
+                    {item.status === "distribuido" && (
+                      <Typography
+                        variant="small"
+                        color={theme.colors.neutral.darkGray}
+                      >
+                        Sua doação foi entregue a quem precisava!
+                      </Typography>
+                    )}
+                  </View>
+                </View>
+              </View>
+            </Card>
+
+            {/* Ações disponíveis */}
+            {isOwner && item.status === "disponivel" && (
+              <Button
+                title="Cancelar Doação"
+                onPress={handleCancelDonation}
+                variant="secondary"
+                style={styles.actionButton}
+              />
+            )}
+          </ScrollView>
+        </View>
+      </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
+    safeArea: {
+        flex: 1,
+        backgroundColor: "#0f0f0f",
+    },
   container: {
     flex: 1,
     backgroundColor: theme.colors.neutral.white,
@@ -430,7 +440,7 @@ const styles = StyleSheet.create({
   },
   mainImage: {
     width: "100%",
-    height: 250,
+    height: 350,
     backgroundColor: theme.colors.neutral.lightGray,
   },
   thumbnailContainer: {

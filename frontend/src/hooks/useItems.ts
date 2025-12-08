@@ -1,16 +1,11 @@
 /**
  * Hook personalizado para gerenciamento de itens
  */
-import { useCallback, useState } from "react";
+import {useCallback, useState} from "react";
 import ItemsService from "../api/items";
-import {
-  Item,
-  CreateItemDto,
-  UpdateItemDto,
-  ItemStatus,
-} from "../types/items.types";
-import { PageOptionsDto } from "../types/common.types";
-import { extractItemsData, extractItemsMeta } from "../utils/typeGuards";
+import {CreateItemDto, Item, ItemStatus, UpdateItemDto,} from "../types/items.types";
+import {PageOptionsDto} from "../types/common.types";
+import {extractItemsData, extractItemsMeta} from "../utils/typeGuards";
 
 // Hook para gerenciamento de itens
 export const useItems = () => {
@@ -291,6 +286,22 @@ export const useItems = () => {
     }
   }, []);
 
+  const requestItem = useCallback(async (id: string, userId: string) => {
+      setIsLoading(true);
+      setError(null);
+
+      try {
+          const item = await ItemsService.requestItem(id, userId);
+          setItem(item);
+          return item;
+      } catch (err: any) {
+          setError(err.message || "Erro ao fazer solicitação do item!");
+          return null;
+      } finally {
+          setIsLoading(false);
+      }
+  }, [])
+
   // Retornar as funções e estado
   return {
     // Estado
@@ -312,6 +323,7 @@ export const useItems = () => {
     uploadPhotos,
     removePhoto,
     clearError,
+    requestItem,
   };
 };
 

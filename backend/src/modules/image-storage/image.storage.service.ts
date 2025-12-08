@@ -2,6 +2,7 @@
 import { Injectable } from '@nestjs/common';
 import { Client } from 'minio';
 import { minioClient } from '../../common/minio/minio.config';
+import * as process from 'node:process';
 
 @Injectable()
 export class ImageStorageService {
@@ -35,6 +36,6 @@ export class ImageStorageService {
   }
 
   getUrl(filename: string): string {
-    return `http://localhost:9000/${this.bucket}/${filename}`;
+    return `http://${process.env.API_BASE_URL}:9000/${this.bucket}/${filename}`;
   }
 }

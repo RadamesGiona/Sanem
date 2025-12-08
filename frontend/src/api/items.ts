@@ -11,6 +11,7 @@ import {
 } from "../types/items.types";
 import { PageOptionsDto } from "../types/common.types";
 import {HttpResponse} from "./types/http.response";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 // Namespace para agrupar as funções do serviço
 const ItemsService = {
@@ -32,8 +33,8 @@ const ItemsService = {
    * @returns Item encontrado
    */
   getById: async (id: string): Promise<Item> => {
-    const response = await api.get<Item>(`/items/${id}`);
-    return response.data;
+    const response = await api.get<HttpResponse<Item>>(`/items/${id}`);
+    return response.data.data;
   },
 
   /**
@@ -42,8 +43,88 @@ const ItemsService = {
    * @returns Item criado
    */
   create: async (itemData: CreateItemDto): Promise<Item> => {
-    const response = await api.post<Item>("/items", itemData);
-    return response.data;
+      console.log('[ItemsService] ==> INÍCIO <==');
+
+      const formData = new FormData();
+
+      // Adicionar campos do item
+      formData.append('type', itemData.type);
+      formData.append('description', itemData.description);
+      formData.append('donorId', itemData.donorId);
+
+      if (itemData.conservationState) {
+          formData.append('conservationState', itemData.conservationState);
+      }
+
+      if (itemData.size) {
+          formData.append('size', itemData.size);
+      }
+
+      if (itemData.categoryId) {
+          formData.append('categoryId', itemData.categoryId);
+      }
+
+      // Adicionar as imagens
+      if (itemData.photos && itemData.photos.length > 0) {
+          console.log('[ItemsService] Processando', itemData.photos.length, 'fotos');
+
+          itemData.photos.forEach((photoUri, index) => {
+              const fileName = photoUri.split('/').pop() || `image_${index}.jpg`;
+
+              let mimeType = 'image/jpeg';
+              const lowerFileName = fileName.toLowerCase();
+              if (lowerFileName.endsWith('.png')) {
+                  mimeType = 'image/png';
+              } else if (lowerFileName.endsWith('.jpg') || lowerFileName.endsWith('.jpeg')) {
+                  mimeType = 'image/jpeg';
+              }
+
+              const file: any = {
+                  uri: photoUri,
+                  type: mimeType,
+                  name: fileName,
+              };
+
+              console.log(`[ItemsService] Foto ${index}:`, file);
+              formData.append('images', file);
+          });
+      }
+
+      console.log('[ItemsService] Enviando com FETCH nativo...');
+
+      try {
+          // Obter token
+          const token = await AsyncStorage.getItem("@auth_token");
+
+          // Usar fetch nativo
+          const response = await fetch(`http://192.168.0.100:3000/items`, {
+              method: 'POST',
+              headers: {
+                  'Authorization': `Bearer ${token}`,
+                  // NÃO definir Content-Type - deixar o fetch definir automaticamente
+              },
+              body: formData,
+          });
+
+          console.log('[ItemsService] Response status:', response.status);
+
+          if (!response.ok) {
+              const errorData = await response.json().catch(() => null);
+              console.error('[ItemsService] Erro da API:', errorData);
+              throw new Error(errorData?.message || `HTTP Error: ${response.status}`);
+          }
+
+          const data = await response.json();
+          console.log('[ItemsService] ✅ Sucesso!');
+          return data;
+
+      } catch (error: any) {
+          console.error('[ItemsService] ❌ Erro:', {
+              message: error.message,
+              stack: error.stack,
+          });
+          throw error;
+      }
   },
 
   /**
@@ -151,6 +232,11 @@ const ItemsService = {
     });
     return response.data;
   },
+
+  requestItem: async (id: string, userId: string): Promise<Item> => {
+      const response = await api.post<HttpResponse<Item>>(`/items/request-item/${id}/${userId}`, {});
+      return response.data.data;
+  }
 };
 
 export default ItemsService;

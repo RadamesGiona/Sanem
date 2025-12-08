@@ -47,7 +47,7 @@ interface DonationFormValues {
         uri: string;
         name: string;
         type: string;
-  }> | null;
+  }>;
 }
 
 // Interface para notificação
@@ -121,64 +121,64 @@ const NewDonationScreen: React.FC = () => {
   }, [fetchCategories]);
 
   // Função para lidar com a submissão da nova doação
-  const handleSubmit = useCallback(
-    async (
-        values: DonationFormValues,
-        { resetForm }: { resetForm: () => void }
-    ): Promise<void> => {
-      if (!user) {
-        setNotification({
-          visible: true,
-          type: "error",
-          message: "Erro ao criar doação",
-          description: "Você precisa estar logado para doar.",
-        });
-        return;
-      }
+    const handleSubmit = useCallback(
+        async (
+            values: DonationFormValues,
+            { resetForm }: { resetForm: () => void }
+        ): Promise<void> => {
+            if (!user) {
+                setNotification({
+                    visible: true,
+                    type: "error",
+                    message: "Erro ao criar doação",
+                    description: "Você precisa estar logado para doar.",
+                });
+                return;
+            }
 
-      try {
+            try {
+                // Extrair apenas os URIs das fotos
+                const photos = values.photos.map(photo => photo.uri);
 
-      const itemData: CreateItemDto = {
-          ...values,
-          donorId: user.id,
-          photos:
-              values.photos != null && values.photos.length > 0
-                  ? values.photos.map(photo => photo.uri)
-                  : null as any,
-      };
+                const itemData: CreateItemDto = {
+                    type: values.type,
+                    description: values.description,
+                    conservationState: values.conservationState,
+                    size: values.size,
+                    categoryId: values.categoryId,
+                    donorId: user.id,
+                    photos: photos,
+                };
 
-        // Criar o item
-        const newItem = await createItem(itemData);
+                // Criar o item
+                const newItem = await createItem(itemData);
 
-        if (newItem) {
-          // Mostrar notificação de sucesso
-          setNotification({
-            visible: true,
-            type: "success",
-            message: "Doação cadastrada com sucesso!",
-            description: "Obrigado pela sua contribuição.",
-          });
+                if (newItem) {
+                    setNotification({
+                        visible: true,
+                        type: "success",
+                        message: "Doação cadastrada com sucesso!",
+                        description: "Obrigado pela sua contribuição.",
+                    });
 
-          // Limpar campos e navegar após 2 segundos
-          setTimeout(() => {
-            setNotification((prev) => ({ ...prev, visible: false }));
-            resetForm();
-            navigation.navigate(DOADOR_ROUTES.MY_DONATIONS as never);
-          }, 2000);
-        }
-      } catch (err) {
-        console.error("Erro ao criar item:", err);
-        setNotification({
-          visible: true,
-          type: "error",
-          message: "Erro ao criar doação",
-          description:
-            "Não foi possível cadastrar sua doação. Tente novamente.",
-        });
-      }
-    },
-    [user, createItem, navigation]
-  );
+                    setTimeout(() => {
+                        setNotification((prev) => ({ ...prev, visible: false }));
+                        resetForm();
+                        navigation.navigate(DOADOR_ROUTES.MY_DONATIONS as never);
+                    }, 2000);
+                }
+            } catch (err) {
+                console.error("Erro ao criar item:", err);
+                setNotification({
+                    visible: true,
+                    type: "error",
+                    message: "Erro ao criar doação",
+                    description: "Não foi possível cadastrar sua doação. Tente novamente.",
+                });
+            }
+        },
+        [user, createItem, navigation]
+    );
 
   // Função para fechar notificações
   const handleCloseNotification = useCallback((): void => {

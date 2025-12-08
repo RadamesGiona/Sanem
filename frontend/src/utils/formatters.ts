@@ -4,23 +4,16 @@
 
 /**
  * Formata uma data para exibição no formato brasileiro (DD/MM/YYYY)
- * @param dateString String de data ou objeto Date
  * @returns Data formatada
+ * @param input
  */
-export const formatDate = (dateString: string | Date): string => {
-  try {
-    const date =
-      typeof dateString === "string" ? new Date(dateString) : dateString;
-
-    return date.toLocaleDateString("pt-BR", {
-      day: "2-digit",
-      month: "2-digit",
-      year: "numeric",
-    });
-  } catch (error) {
-    console.error("Erro ao formatar data:", error);
-    return "Data inválida";
-  }
+export const formatDate = (input: string): string => {
+    try {
+        const date = new Date(input);
+        return `${date.getDate() < 10 ? "0" + date.getDate() : date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
+    } catch (error) {
+        return "Data/hora inválida"
+    }
 };
 
 /**

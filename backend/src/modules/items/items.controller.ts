@@ -13,7 +13,7 @@ import {
   Post,
   Query,
   Request,
-  UploadedFile,
+  UploadedFiles,
   UseGuards,
   UseInterceptors,
   UsePipes,
@@ -37,7 +37,7 @@ import { PageOptionsDto } from '../../common/pagination/dto/page-options.dto';
 import { PageDto } from '../../common/pagination/dto/page.dto';
 import { Item, ItemStatus } from './entities/item.entity';
 import { ImageStorageService } from '../image-storage/image.storage.service';
-import { FileInterceptor } from '@nestjs/platform-express';
+import { FilesInterceptor } from '@nestjs/platform-express';
 
 @ApiTags('items')
 @Controller('items')
@@ -57,26 +57,29 @@ export class ItemsController {
   @ApiResponse({ status: 404, description: 'Doador não encontrado.' })
   @Roles(UserRole.ADMIN, UserRole.FUNCIONARIO, UserRole.DOADOR) // Admin, Funcionário ou o próprio Doador podem criar
   @UsePipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }))
-  @UseInterceptors(FileInterceptor('image'))
+  @UseInterceptors(FilesInterceptor('images', 5))
   async create(
     @Body() createItemDto: CreateItemDto,
     @Request() req,
-    @UploadedFile() file: Express.Multer.File,
+    @UploadedFiles() files: Express.Multer.File[],
   ) {
-    let imageUrl: string | undefined = undefined;
+    if (!files || files.length === 0) {
+      throw new BadRequestException('Você precisa enviar ao menos uma imagem');
+    }
 
-    if (file) {
-      imageUrl = await this.imageStorageService.upload(
+    const imageUrls: string[] = [];
+
+    for (const file of files) {
+      const url = await this.imageStorageService.upload(
         file.buffer,
         file.originalname,
         file.mimetype,
       );
+
+      imageUrls.push(url);
     }
 
-    if (!imageUrl)
-      throw new BadRequestException('Você precisa enviar uma imagem');
-
-    return this.itemsService.create(createItemDto, req.user, [imageUrl]);
+    return this.itemsService.create(createItemDto, req.user, imageUrls);
   }
 
   @Get()
@@ -150,6 +153,21 @@ export class ItemsController {
   ) // Todos podem ver detalhes de um item
   findOne(@Param('id', ParseUUIDPipe) id: string) {
     return this.itemsService.findOne(id);
+  }
+
+  @Post('request-item/:id/:userId')
+  @ApiOperation({ summary: 'Buscar um item/doação pelo ID' })
+  @ApiResponse({ status: 200, description: 'Item encontrado.' })
+  @ApiResponse({ status: 404, description: 'Item não encontrado.' })
+  @Roles(
+    UserRole.ADMIN,
+    UserRole.FUNCIONARIO,
+
+    UserRole.DOADOR,
+    UserRole.BENEFICIARIO,
+  ) // Todos podem ver detalhes de um item
+  requestItem(@Param('id') id: string, @Param('userId') userId: string) {
+    return this.itemsService.requestItem(id, userId);
   }
 
   @Patch(':id')

@@ -5,7 +5,7 @@ import { API_ENVIRONMENT } from "@env";
 // URLs disponíveis
 const API_URLS = {
   CLOUD: "https://solidarios-app-dwus7.ondigitalocean.app/api",
-  LOCAL: "http://192.168.0.103:3000", // Para emuladores Android
+  LOCAL: "http://192.168.0.100:3000", // Para emuladores Android
   // LOCAL: "http://localhost:3000", // Para web ou iOS
 };
 
@@ -69,22 +69,6 @@ const api = axios.create({
 // Inicializa o ambiente (chamado na inicialização do app)
 initApiEnvironment();
 
-// Log de requisições
-api.interceptors.request.use(
-  (config) => {
-    console.log("[API] Requisição:", {
-      method: config.method?.toUpperCase(),
-      url: `${config.url}`,
-      params: config.params,
-    });
-    return config;
-  },
-  (error) => {
-    console.error("[API] Erro na requisição:", error);
-    return Promise.reject(error);
-  }
-);
-
 // Log de respostas e handling de refresh token
 api.interceptors.response.use(
   (response) => {
@@ -104,25 +88,33 @@ api.interceptors.response.use(
   }
 );
 
-// Adicionar token de autenticação em cada requisição
+// Adicionar token de autenticação em cada requisição detectar FormData e removendo Content-Type
 api.interceptors.request.use(
-  async (config) => {
-    // Não adicionar token para rotas de autenticação
-    if (
-      config.url?.includes("/auth/login") ||
-      config.url?.includes("/auth/refresh")
-    ) {
-      return config;
-    }
+    async (config) => {
+        // Adicionar token de autenticação
+        if (
+            !config.url?.includes("/auth/login") &&
+            !config.url?.includes("/auth/refresh")
+        ) {
+            const token = await AsyncStorage.getItem("@auth_token");
+            if (token) {
+                config.headers.Authorization = `Bearer ${token}`;
+            }
+        }
 
-    const token = await AsyncStorage.getItem("@auth_token");
-    console.log("AUTH TOKEN: "+ token);
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
+        // Log de requisições
+        console.log("[API] Requisição:", {
+            method: config.method?.toUpperCase(),
+            url: config.url,
+            hasFormData: config.data instanceof FormData,
+        });
+
+        return config;
+    },
+    (error) => {
+        console.error("[API] Erro na requisição:", error);
+        return Promise.reject(error);
     }
-    return config;
-  },
-  (error) => Promise.reject(error)
 );
 
 export default api;

@@ -1,8 +1,9 @@
 // src/modules/items/items.service.ts
 import {
+  BadRequestException,
+  ForbiddenException,
   Injectable,
   NotFoundException,
-  ForbiddenException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -184,6 +185,27 @@ export class ItemsService {
     } catch (error) {
       this.logger.error(
         `Erro ao buscar item por ID ${id}: ${error.message}`,
+        error.stack,
+      );
+      throw error;
+    }
+  }
+
+  @LogMethod()
+  async requestItem(id: string, userId: string): Promise<Item> {
+    try {
+      const item = await this.findOne(id);
+      this.logger.log(`Solicitando item: ${id}`);
+
+      if (item.status !== ItemStatus.DISPONIVEL) {
+        throw new BadRequestException('Este item não está mais disponível!');
+      }
+
+      item.status = ItemStatus.RESERVADO;
+      return this.itemsRepository.save(item);
+    } catch (error) {
+      this.logger.error(
+        `Erro ao solicitar item ${id}: ${error.message}`,
         error.stack,
       );
       throw error;
