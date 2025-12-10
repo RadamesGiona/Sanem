@@ -166,30 +166,6 @@ export const ProfileScreen: React.FC = () => {
                             />
                         </View>
                     </View>
-
-                    {user.phone && (
-                        <View style={styles.contactInfo}>
-                            <Typography
-                                variant="bodySecondary"
-                                color={theme.colors.neutral.darkGray}
-                            >
-                                Telefone:
-                            </Typography>
-                            <Typography variant="body">{user.phone}</Typography>
-                        </View>
-                    )}
-
-                    {user.address && (
-                        <View style={styles.contactInfo}>
-                            <Typography
-                                variant="bodySecondary"
-                                color={theme.colors.neutral.darkGray}
-                            >
-                                Endereço:
-                            </Typography>
-                            <Typography variant="body">{user.address}</Typography>
-                        </View>
-                    )}
                 </Card>
 
                 {/* Menu de opções */}

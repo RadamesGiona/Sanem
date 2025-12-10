@@ -15,6 +15,7 @@ import CreateItemScreen from "../screens/admin/CreateItemScreen";
 import CreateDistributionScreen from "../screens/admin/CreateDistributionScreen";
 import BeneficiariesScreen from "../screens/funcionario/BeneficiariesScreen";
 import BeneficiaryDetailScreen from "../screens/funcionario/BeneficiaryDetailScreen";
+import ApproveDistributionsScreen from '../screens/admin/ApproveDistributionsScreen'
 
 // Implementação real dos ícones usando react-native-vector-icons
 const DashboardIcon = ({ color }: { color: string }) => (
@@ -53,9 +54,7 @@ const DashboardNavigator = () => {
 const ItemsNavigator = () => {
   return (
     <ItemsStack.Navigator screenOptions={{ headerShown: false }}>
-      <ItemsStack.Screen name="ItemsList" component={ItemsScreen} />
-      <ItemsStack.Screen name="ItemDetail" component={ItemDetailScreen} />
-      <ItemsStack.Screen name="CreateItem" component={CreateItemScreen} />
+      <ItemsStack.Screen name="ApproveDistributions" component={ApproveDistributionsScreen} />
     </ItemsStack.Navigator>
   );
 };

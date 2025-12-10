@@ -31,7 +31,7 @@ import {useDistributions} from "../../hooks/useDistributions";
 import {ItemStatus, ItemType} from "../../types/items.types";
 import {BENEFICIARIO_ROUTES} from "../../navigation/routes";
 import {formatDate} from "../../utils/formatters";
-import WarnCard from "../../components/common/warn.card";
+import WarnCard from "../../components/common/WarnCard";
 
 // Interface para a rota
 type ItemDetailScreenRouteProp = RouteProp<
@@ -91,9 +91,7 @@ const ItemDetailScreen: React.FC = () => {
                     text: "Confirmar",
                     onPress: async () => {
                         try {
-
                             await requestItem(item.id, user.id);
-
                             // Mostrar notificação de sucesso
                             setNotification({
                                 visible: true,

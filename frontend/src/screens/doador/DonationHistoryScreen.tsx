@@ -3,6 +3,7 @@ import { View, StyleSheet, FlatList, RefreshControl } from "react-native";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { DoadorDonationsStackParamList } from "../../navigation/types";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 // Componentes
 import {
@@ -94,45 +95,54 @@ const DonationHistoryScreen: React.FC = () => {
   }
 
   return (
-    <View style={styles.container}>
-      {/* Cabeçalho */}
-      <Header
-        title="Histórico de Doações"
-        onBackPress={() => navigation.goBack()}
-        backgroundColor={theme.colors.primary.secondary}
-      />
+    <SafeAreaView
+      style={styles.safeArea}
+      edges={['top', 'left', 'right']}
+    >
+      <View style={styles.container}>
+        {/* Cabeçalho */}
+        <Header
+          title="Histórico de Doações"
+          onBackPress={() => navigation.goBack()}
+          backgroundColor={theme.colors.primary.secondary}
+        />
 
-      <FlatList
-        data={items}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
-          <ItemCard
-            item={item}
-            onPress={() =>
-              navigation.navigate("DonationDetail", { id: item.id })
-            }
-          />
-        )}
-        contentContainerStyle={styles.listContent}
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
-        }
-        onEndReached={handleLoadMore}
-        onEndReachedThreshold={0.5}
-        ListEmptyComponent={
-          <EmptyState
-            title="Sem histórico de doações"
-            description="Você ainda não realizou doações"
-            actionLabel="Fazer uma doação"
-            onAction={navigateToNewDonation}
-          />
-        }
-      />
-    </View>
+        <FlatList
+          data={items}
+          keyExtractor={(item) => item.id}
+          renderItem={({ item }) => (
+            <ItemCard
+              item={item}
+              onPress={() =>
+                navigation.navigate("DonationDetail", { id: item.id })
+              }
+            />
+          )}
+          contentContainerStyle={styles.listContent}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
+          }
+          onEndReached={handleLoadMore}
+          onEndReachedThreshold={0.5}
+          ListEmptyComponent={
+            <EmptyState
+              title="Sem histórico de doações"
+              description="Você ainda não realizou doações"
+              actionLabel="Fazer uma doação"
+              onAction={navigateToNewDonation}
+            />
+          }
+        />
+      </View>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: "#0f0f0f",
+  },
   container: {
     flex: 1,
     padding: 0,

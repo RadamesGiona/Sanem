@@ -29,88 +29,61 @@ export class DistributionsService {
     private inventoryService: InventoryService,
   ) {}
 
-  async create(
-    createDistributionDto: CreateDistributionDto,
-    currentUser: User,
-  ): Promise<Distribution> {
-    // Código existente para criar distribuição...
-    // Verificar se o beneficiário existe e é um beneficiário
-    const beneficiary = await this.usersService.findOne(
-      createDistributionDto.beneficiaryId,
+async create(
+  createDistributionDto: CreateDistributionDto,
+  currentUser: User,
+): Promise<Distribution> {
+
+  const beneficiary = await this.usersService.findOne(
+    createDistributionDto.beneficiaryId,
+  );
+  if (beneficiary.role !== UserRole.BENEFICIARIO) {
+    throw new ConflictException(
+      `Usuário com ID ${createDistributionDto.beneficiaryId} não é um beneficiário.`,
     );
-    if (beneficiary.role !== UserRole.BENEFICIARIO) {
-      throw new ConflictException(
-        `Usuário com ID ${createDistributionDto.beneficiaryId} não é um beneficiário.`,
-      );
-    }
-
-    // Verificar se o funcionário existe e é um funcionário
-    const employee = await this.usersService.findOne(
-      createDistributionDto.employeeId,
-    );
-    if (
-      employee.role !== UserRole.FUNCIONARIO &&
-      employee.role !== UserRole.ADMIN
-    ) {
-      throw new ConflictException(
-        `Usuário com ID ${createDistributionDto.employeeId} não é um funcionário ou admin.`,
-      );
-    }
-
-    // Buscar todos os itens e verificar se estão disponíveis no inventário
-    const items: Item[] = [];
-    for (const itemId of createDistributionDto.itemIds) {
-      const item = await this.itemsService.findOne(itemId);
-
-      // Verificar se o item está disponível
-      if (item.status !== ItemStatus.DISPONIVEL) {
-        throw new ConflictException(
-          `Item com ID ${itemId} não está disponível para distribuição.`,
-        );
-      }
-
-      // Verificar se o item está no inventário e tem quantidade suficiente
-      try {
-        const inventoryEntry = await this.inventoryService.findByItemId(itemId);
-        if (inventoryEntry.quantity < 1) {
-          throw new ConflictException(
-            `Item com ID ${itemId} não tem quantidade suficiente em estoque.`,
-          );
-        }
-
-        // Atualizar o inventário (reduzir a quantidade)
-        await this.inventoryService.updateQuantity(itemId, -1);
-
-        // Atualizar o status do item para DISTRIBUIDO
-        await this.itemsService.update(
-          itemId,
-          { status: ItemStatus.DISTRIBUIDO },
-          currentUser,
-        );
-
-        items.push(item);
-      } catch (error) {
-        if (error instanceof NotFoundException) {
-          throw new ConflictException(
-            `Item com ID ${itemId} não está registrado no inventário.`,
-          );
-        }
-        throw error;
-      }
-    }
-
-    // Criar a distribuição
-    const distribution = this.distributionsRepository.create({
-      beneficiary,
-      beneficiaryId: beneficiary.id,
-      employee,
-      employeeId: employee.id,
-      items,
-      observations: createDistributionDto.observations,
-    });
-
-    return this.distributionsRepository.save(distribution);
   }
+
+  // Verificar se o funcionário existe e é um funcionário
+  const employee = await this.usersService.findOne(
+    createDistributionDto.employeeId,
+  );
+  if (
+    employee.role !== UserRole.FUNCIONARIO &&
+    employee.role !== UserRole.ADMIN
+  ) {
+    throw new ConflictException(
+      `Usuário com ID ${createDistributionDto.employeeId} não é um funcionário ou admin.`,
+    );
+  }
+
+  // Buscar o item e verificar se está disponível
+  const item = await this.itemsService.findOne(createDistributionDto.itemId);
+
+  // Verificar se o item está reservado
+  if (item.status !== ItemStatus.RESERVADO) {
+    throw new ConflictException(
+      `Item com ID ${createDistributionDto.itemId} não está reservado para distribuição.`,
+    );
+  }
+
+  // Atualizar o status do item para DISTRIBUIDO
+  await this.itemsService.update(
+    createDistributionDto.itemId,
+    { status: ItemStatus.DISTRIBUIDO },
+    currentUser,
+  );
+
+  const distribution = this.distributionsRepository.create({
+    beneficiary,
+    beneficiaryId: beneficiary.id,
+    employee,
+    employeeId: employee.id,
+    items: [item], // ✅ Array com 1 item - mantém compatível com ManyToMany
+    observations: createDistributionDto.observations,
+  });
+
+  return this.distributionsRepository.save(distribution);
+}
 
   // Método antigo sem paginação, mantido para compatibilidade
   async findAll(): Promise<Distribution[]> {

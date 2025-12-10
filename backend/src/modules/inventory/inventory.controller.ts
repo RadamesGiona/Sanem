@@ -38,7 +38,7 @@ import { Inventory } from './entities/inventory.entity';
 @ApiBearerAuth()
 export class InventoryController {
   constructor(private readonly inventoryService: InventoryService) {}
-
+      
   @Post()
   @ApiOperation({ summary: 'Adicionar um item ao inventário' })
   @ApiResponse({

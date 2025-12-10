@@ -51,7 +51,7 @@ export class DistributionsController {
     description: 'Conflito (item não disponível, etc).',
   })
   @Roles(UserRole.ADMIN, UserRole.FUNCIONARIO)
-  @UsePipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }))
+  @UsePipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true, transform: true}))
   create(@Body() createDistributionDto: CreateDistributionDto, @Request() req) {
     return this.distributionsService.create(createDistributionDto, req.user);
   }

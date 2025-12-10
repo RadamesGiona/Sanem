@@ -1,6 +1,4 @@
 import {
-  IsArray,
-  ArrayNotEmpty,
   IsNotEmpty,
   IsOptional,
   IsString,
@@ -10,7 +8,7 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class CreateDistributionDto {
   @ApiProperty({
-    example: 'uuid-do-beneficiario',
+    example: '18ae3d51-7136-4806-9bab-bf5f61e5848c',
     description: 'ID do usuário beneficiário',
   })
   @IsNotEmpty({ message: 'O ID do beneficiário é obrigatório' })
@@ -18,7 +16,7 @@ export class CreateDistributionDto {
   beneficiaryId: string;
 
   @ApiProperty({
-    example: 'uuid-do-funcionario',
+    example: 'e9be3eed-b704-4c2f-8bcd-3619e175c3a5',
     description: 'ID do usuário funcionário que realizou a distribuição',
   })
   @IsNotEmpty({ message: 'O ID do funcionário é obrigatório' })
@@ -26,17 +24,12 @@ export class CreateDistributionDto {
   employeeId: string;
 
   @ApiProperty({
-    type: [String],
-    example: ['uuid-do-item-1', 'uuid-do-item-2'],
-    description: 'Lista de IDs dos itens distribuídos',
+    example: 'fc5705c7-1940-47bc-923f-3a6471cc6c6a',
+    description: 'ID do item distribuído',
   })
-  @IsArray({ message: 'A lista de itens deve ser um array' })
-  @ArrayNotEmpty({ message: 'A lista de itens não pode estar vazia' })
-  @IsUUID('4', {
-    each: true,
-    message: 'Cada ID de item deve ser um UUID válido',
-  })
-  itemIds: string[];
+  @IsNotEmpty({ message: 'O ID do item é obrigatório' })
+  @IsUUID('4', { message: 'ID do item inválido' })
+  itemId: string;
 
   @ApiPropertyOptional({
     example: 'Entregue na data X',
