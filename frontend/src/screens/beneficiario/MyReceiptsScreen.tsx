@@ -23,6 +23,7 @@ import { useDistributions } from "../../hooks/useDistributions";
 // Tipos e rotas
 import { Distribution } from "../../types/distributions.types";
 import { BENEFICIARIO_ROUTES } from "../../navigation/routes";
+import { PrincipalHeader } from '../../components/common/PrincipalHeader'
 
 const MyReceiptsScreen: React.FC = () => {
   const navigation =
@@ -268,10 +269,9 @@ const MyReceiptsScreen: React.FC = () => {
   return (
     <View style={styles.container}>
       {/* Cabeçalho */}
-      <Header
+      <PrincipalHeader
         title="Meus Recebimentos"
         subtitle={`Olá, ${user?.name?.split(" ")[0] || "Beneficiário"}`}
-        backgroundColor={theme.colors.primary.secondary}
       />
 
       {/* Conteúdo */}

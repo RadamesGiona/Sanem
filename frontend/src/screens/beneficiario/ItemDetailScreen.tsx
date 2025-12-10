@@ -194,7 +194,7 @@ const ItemDetailScreen: React.FC = () => {
                     style={styles.content}
                     contentContainerStyle={styles.contentContainer}
                 >
-                    {item.status === ItemStatus.RESERVADO && (
+                    {item.status === ItemStatus.RESERVADO && item.reservedById === user.id && (
                         <WarnCard
                             message={"O item já está reservado para você. Passe no local para realizar a retirada!"}
                             style={{ marginBottom: theme.spacing.m }}

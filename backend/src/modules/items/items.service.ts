@@ -103,7 +103,8 @@ export class ItemsService {
       const queryBuilder = this.itemsRepository
         .createQueryBuilder('item')
         .leftJoinAndSelect('item.donor', 'donor')
-        .leftJoinAndSelect('item.category', 'category');
+        .leftJoinAndSelect('item.category', 'category')
+        .leftJoinAndSelect('item.reservedBy', 'reservedBy');
 
       // Filtro por status (opcional)
       if (status) {
@@ -194,14 +195,21 @@ export class ItemsService {
   @LogMethod()
   async requestItem(id: string, userId: string): Promise<Item> {
     try {
-      const item = await this.findOne(id);
+      this.logger.log(`Solicitando user: ${userId}`);
+      const user = await this.usersService.findOne(userId);
+      
       this.logger.log(`Solicitando item: ${id}`);
+      const item = await this.findOne(id);
+
 
       if (item.status !== ItemStatus.DISPONIVEL) {
         throw new BadRequestException('Este item não está mais disponível!');
       }
 
       item.status = ItemStatus.RESERVADO;
+      item.reservedBy = user;
+      item.reservedById = userId;  
+      item.reservedDate = new Date();
       return this.itemsRepository.save(item);
     } catch (error) {
       this.logger.error(

@@ -40,7 +40,8 @@ import { useItems } from "../../hooks/useItems";
 // Tipos e rotas
 import { DOADOR_ROUTES } from "../../navigation/routes";
 import { formatDate } from "../../utils/formatters";
-import { ItemType } from "../../types/items.types";
+import { ItemStatus, ItemType } from "../../types/items.types";
+import WarnCard from '../../components/common/WarnCard'
 
 // Interface para a rota
 type DonationDetailScreenRouteProp = RouteProp<
@@ -216,6 +217,14 @@ const DonationDetailScreen: React.FC = () => {
             style={styles.content}
             contentContainerStyle={styles.contentContainer}
           >
+
+          { item.status === "distribuido" && isOwner && (
+            <WarnCard
+                message={"Seu Item foi distribuido, agradecemos pela sua contribuição!"}
+                style={{ marginBottom: theme.spacing.m }}
+              />
+            )}
+
             {/* Galeria de imagens */}
             <View style={styles.imageContainer}>
               {item.photos && item.photos.length > 0 ? (
@@ -368,7 +377,7 @@ const DonationDetailScreen: React.FC = () => {
                         variant="small"
                         color={theme.colors.neutral.darkGray}
                       >
-                        Item reservado para distribuição
+                      { item.reservedDate != null ? formatDate(item.reservedDate!) : "Item aguardando retirada pelo beneficiário"}                        
                       </Typography>
                     )}
                   </View>

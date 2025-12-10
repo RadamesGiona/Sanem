@@ -37,6 +37,11 @@ export interface Item {
   // Relacionamentos que podem vir nulos da API
   donor?: User | null;
   category?: Category | null;
+
+  reservedBy?: User | null;
+  reservedById?: string | null;
+
+  reservedDate?: string;
 }
 
 // Interface para respostas da API que incluem items

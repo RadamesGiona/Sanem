@@ -34,6 +34,8 @@ import { ItemStatus, Item } from '../../types/items.types'
 // Hooks
 import { useAuth } from '../../hooks/useAuth'
 import useItems from '../../hooks/useItems'
+import useDistributions from '../../hooks/useDistributions'
+import { CreateDistributionDto } from '../../types/distributions.types'
 
 const ApproveDistributionsScreen: React.FC = () => {
   const navigation =
@@ -60,10 +62,14 @@ const ApproveDistributionsScreen: React.FC = () => {
     clearError,
   } = useItems();
 
+  const {
+    createDistribution,
+    isLoading: isDistributionLoading,
+  } = useDistributions();
+
   const loadReservedItems = useCallback(
     async (page = 1) => {
       await fetchItemsByStatus(ItemStatus.RESERVADO, { page, take: 10 });
-      console.log('Pagination após load:', pagination);
     },
     [fetchItemsByStatus]
   );
@@ -83,7 +89,6 @@ const ApproveDistributionsScreen: React.FC = () => {
 
   // Função para mudar de página
   const handlePageChange = async (page: number) => {
-    console.log('handlePageChange chamado com página:', page);
     await loadReservedItems(page);
   };
 
@@ -106,48 +111,67 @@ const ApproveDistributionsScreen: React.FC = () => {
     }
     return null;
   };
-
 const handleApproveDistribution = async (item: Item) => {
-  Alert.alert(
-    "Confirmar Distribuição",
-    "Tem certeza que deseja distribuir esse item?",
-    [
-      {
-        text: "Não",
-        style: "cancel",
-      },
-      {
-        text: "Sim, distribuir",
-        style: "default",
-        onPress: async () => {
-          try {
-            // Aprovar a distribuição
-            // await approveDistribution(item.id);
-            
-            setNotification({
-              visible: true,
-              type: "success",
-              message: "Distribuição aprovada!",
-              description: `O item "${item.description}" foi aprovado para distribuição.`,
-            });
-            
-            // Recarregar os dados após 1.5s
-            setTimeout(async () => {
-              await loadReservedItems(pagination?.page || 1);
-            }, 1500);
-            
-          } catch (err) {
-            setNotification({
-              visible: true,
-              type: "error",
-              message: "Erro ao aprovar distribuição.",
-              description: "Não foi possível aprovar a distribuição. Tente novamente.",
-            });
-          }
+    Alert.alert(
+      "Confirmar Distribuição",
+      "Tem certeza que deseja distribuir esse item?",
+      [
+        {
+          text: "Não",
+          style: "cancel",
         },
-      },
-    ]
-  );
+        {
+          text: "Sim, distribuir",
+          style: "default",
+          onPress: async () => {
+            try {
+              if (!item.reservedById) {
+                throw new Error('Item não possui beneficiário associado');
+              }
+
+              // Verificar se temos o usuário logado
+              if (!user?.id) {
+                throw new Error('Usuário não autenticado');
+              }
+
+              // Criar a distribuição
+              const distributionData = {
+                beneficiaryId: item.reservedById,
+                employeeId: user.id,
+                observations: `Distribuição efetuada via sistema`,
+                itemId: item.id,
+              };
+
+              const result = await createDistribution(distributionData);
+              
+              if (result) {
+                setNotification({
+                  visible: true,
+                  type: "success",
+                  message: "Distribuição aprovada!",
+                  description: `O item "${item.description}" foi aprovado para distribuição.`,
+                });
+                
+                // Recarregar os dados após 1.5s
+                setTimeout(async () => {
+                  await loadReservedItems(pagination?.page || 1);
+                }, 1500);
+              } else {
+                throw new Error('Falha ao criar distribuição');
+              }
+              
+            } catch (err: any) {
+              setNotification({
+                visible: true,
+                type: "error",
+                message: "Erro ao aprovar distribuição.",
+                description: err.message || "Não foi possível aprovar a distribuição. Tente novamente.",
+              });
+            }
+          },
+        },
+      ]
+    );
 };
 
   const handleRejectDistribution = async (item: Item) => {
@@ -327,8 +351,7 @@ const handleApproveDistribution = async (item: Item) => {
                 color={theme.colors.neutral.darkGray}
                 style={styles.beneficiaryName}
               >
-                {/* Aqui você adicionaria o nome do beneficiário quando tiver */}
-                Beneficiário não especificado
+                {item.reservedBy?.name || 'Beneficiário não especificado'}
               </Typography>
             </View>
           </View>
@@ -351,8 +374,10 @@ const handleApproveDistribution = async (item: Item) => {
                 variant="body"
                 color={theme.colors.neutral.darkGray}
               >
-                {/* Aqui você adicionaria a data da reserva quando tiver */}
-                {new Date().toLocaleDateString('pt-BR')}
+                {item.reservedDate 
+                  ? new Date(item.reservedDate).toLocaleDateString('pt-BR')
+                  : new Date().toLocaleDateString('pt-BR')
+                }
               </Typography>
             </View>
           </View>
@@ -364,6 +389,7 @@ const handleApproveDistribution = async (item: Item) => {
             style={styles.rejectButton}
             onPress={() => handleRejectDistribution(item)}
             activeOpacity={0.8}
+            disabled={isDistributionLoading}
           >
             <MaterialIcons
               name="close"
@@ -383,6 +409,7 @@ const handleApproveDistribution = async (item: Item) => {
             style={styles.approveButton}
             onPress={() => handleApproveDistribution(item)}
             activeOpacity={0.8}
+            disabled={isDistributionLoading}
           >
             <LinearGradient
               colors={["#006E58", "#00A67E"]}
@@ -390,18 +417,24 @@ const handleApproveDistribution = async (item: Item) => {
               end={{ x: 1, y: 0 }}
               style={styles.approveGradient}
             >
-              <MaterialIcons
-                name="check"
-                size={20}
-                color="#FFFFFF"
-              />
-              <Typography
-                variant="bodySecondary"
-                color="#FFFFFF"
-                style={styles.buttonText}
-              >
-                Aprovar
-              </Typography>
+              {isDistributionLoading ? (
+                <Loading visible={true} size="small" />
+              ) : (
+                <>
+                  <MaterialIcons
+                    name="check"
+                    size={20}
+                    color="#FFFFFF"
+                  />
+                  <Typography
+                    variant="bodySecondary"
+                    color="#FFFFFF"
+                    style={styles.buttonText}
+                  >
+                    Aprovar
+                  </Typography>
+                </>
+              )}
             </LinearGradient>
           </TouchableOpacity>
         </View>
@@ -490,18 +523,9 @@ const handleApproveDistribution = async (item: Item) => {
               </View>
             }
             ListFooterComponent={() => {
-              console.log('🔍 ListFooterComponent renderizando');
-              console.log('📊 Pagination:', pagination);
-              
-              if (!pagination) {
-                console.log('❌ Pagination é null/undefined');
+              if (!pagination || pagination.totalPages <= 1) {
                 return null;
               }
-              
-              console.log('✅ Renderizando Pagination com:', {
-                currentPage: pagination.page,
-                totalPages: pagination.totalPages,
-              });
               
               return (
                 <Pagination

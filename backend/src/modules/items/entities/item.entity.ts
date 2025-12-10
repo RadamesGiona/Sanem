@@ -69,4 +69,14 @@ export class Item {
 
   @Column({ nullable: true })
   categoryId: string;
+
+  @Column({ nullable: true })
+  reservedDate: Date;
+
+  @ManyToOne(() => User, { eager: false, nullable: true })
+  @JoinColumn({ name: 'reservedById' })
+  reservedBy: User;
+
+  @Column({ nullable: true })
+  reservedById: string;
 }

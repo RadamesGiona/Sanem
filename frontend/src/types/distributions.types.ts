@@ -20,7 +20,7 @@ export interface Distribution {
 export interface CreateDistributionDto {
   beneficiaryId: string;
   employeeId: string;
-  itemIds: string[];
+  itemId: string;
   observations?: string;
 }
 

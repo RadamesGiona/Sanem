@@ -24,6 +24,7 @@ import theme from "../../theme";
 
 // Hooks
 import { useAuth } from "../../hooks/useAuth";
+import { PrincipalHeader } from '../../components/common/PrincipalHeader'
 
 const ProfileScreen: React.FC = () => {
   const navigation =
@@ -74,7 +75,7 @@ const ProfileScreen: React.FC = () => {
       />
 
       {/* Cabeçalho */}
-      <Header title="Meu Perfil" backgroundColor={theme.colors.primary.main} />
+      <PrincipalHeader title="Meu Perfil"/>
 
       <ScrollView
         style={styles.content}
