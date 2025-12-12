@@ -156,13 +156,13 @@ export class ItemsController {
   }
 
   @Post('request-item/:id/:userId')
-  @ApiOperation({ summary: 'Buscar um item/doação pelo ID' })
-  @ApiResponse({ status: 200, description: 'Item encontrado.' })
-  @ApiResponse({ status: 404, description: 'Item não encontrado.' })
+  @ApiOperation({ summary: 'Reservar um item disponível' })
+  @ApiResponse({ status: 200, description: 'Item foi reservado com sucesso.' })
+  @ApiResponse({ status: 404, description: 'Item ou usuário não encontrado.' })
+    @ApiResponse({ status: 400, description: 'O item não está disponível.' })
   @Roles(
     UserRole.ADMIN,
     UserRole.FUNCIONARIO,
-
     UserRole.DOADOR,
     UserRole.BENEFICIARIO,
   ) // Todos podem ver detalhes de um item

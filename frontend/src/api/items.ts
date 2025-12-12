@@ -1,7 +1,7 @@
 /**
  * Serviço de itens - comunicação com as rotas de itens/doações do backend
  */
-import api from "./api";
+import api, { getApiBaseUrl } from "./api";
 import {
   Item,
   CreateItemDto,
@@ -38,7 +38,7 @@ const ItemsService = {
   },
 
   /**
-   * Criar novo item
+   * Criar novo item => Utilizando fetch por problemas de integridade entre Axios e o ContentType Form-Data
    * @param itemData Dados do novo item
    * @returns Item criado
    */
@@ -90,18 +90,18 @@ const ItemsService = {
           });
       }
 
-      console.log('[ItemsService] Enviando com FETCH nativo...');
-
       try {
           // Obter token
           const token = await AsyncStorage.getItem("@auth_token");
 
+        console.log(getApiBaseUrl());
+
           // Usar fetch nativo
-          const response = await fetch(`http://192.168.0.100:3000/items`, {
+          const response = await fetch(`${getApiBaseUrl()}/items`, {
               method: 'POST',
               headers: {
                   'Authorization': `Bearer ${token}`,
-                  // NÃO definir Content-Type - deixar o fetch definir automaticamente
+                  // Content-Type: definido pelo fetch
               },
               body: formData,
           });

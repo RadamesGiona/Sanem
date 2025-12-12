@@ -134,7 +134,7 @@ const AvailableItemsScreen: React.FC = () => {
             case ItemStatus.RESERVADO:
                 return ["#807d00", "#807d00"] as const;
             case ItemStatus.DISTRIBUIDO:
-                return ["#9d0000", "#9d0000"] as const;
+                return ["#3B82F6", "#3B82F6"] as const;
             default:
                 return ["#747474", "#747474"] as const;
         }
