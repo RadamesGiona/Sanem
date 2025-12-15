@@ -259,7 +259,6 @@ backend/
 │   │   └── shared/        # Utilitários compartilhados
 │   ├── database/
 │   │   ├── migrations/    # Versionamento do banco
-│   │   └── entities/      # Entidades TypeORM
 │   ├── config/            # Configurações
 │   ├── main.ts            # Bootstrap da aplicação
 │   └── app.module.ts      # Módulo principal
