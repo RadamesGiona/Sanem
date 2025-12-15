@@ -305,16 +305,4 @@ Este projeto é desenvolvido como parte da Oficina de Desenvolvimento de Softwar
 
 ---
 
-## 📧 Contato
-
-**UTFPR** - Universidade Tecnológica Federal do Paraná
-
 🔗 GitHub: [RadamesGiona/Sanem](https://github.com/RadamesGiona/Sanem)
-
----
-
-<div align="center">
-  
-**Desenvolvido com ❤️ pela equipe SANEM**
-
-</div>
