@@ -1,56 +1,146 @@
-Instituição: SANEM – Sociedade de Amparo ao Necessitado Medianeirense
-Time 2: Inimigos da PhP
-Integrantes 
-Radames Giona 
-Gilvan Emerson Sfredo Junior 
-Lucas Fernando Begnini 
-Rocque dos Reis Pennafort 
+SANEM – Sistema Solidário de Doações
+UTFPR – Oficina de Desenvolvimento de Software
 
-Este projeto tem como objetivo desenvolver um sistema mobile para gerenciamento de doações em instituições sociais.
-A plataforma permite cadastrar doações, beneficiários e controlar o estoque em tempo real, além de oferecer ferramentas para distribuição organizada, emissão de relatórios e acompanhamento histórico.
+README — Guia Completo de Instalação e Execução 
 
-Para rodar o projeto:
+1. Visão Geral do Projeto
+O SANEM é um sistema solidário voltado ao gerenciamento de doações.
+Inclui funcionalidades de:
+•	Cadastro e gerenciamento de usuários
+•	Cadastro de doações
+•	Reserva e distribuição de itens
+•	Upload de imagens via MinIO
+•	Consumo de API REST
+•	Painéis e telas para doadores e funcionários
+A arquitetura é dividida em:
+•	Front-end: React Native (Expo)
+•	Back-end: NestJS
+•	Banco de Dados: PostgreSQL
+•	Armazenamento de arquivos: MinIO
+•	Orquestração: Docker
+•	Versionamento DB: Migrations
 
-BackEnd:
+2. 📁 Estrutura Geral do Repositório
+/Sanem
+│
+├── /frontend     → Aplicação mobile (React Native)
+│
+├── /backend      → API, banco, migrations e Docker
+│   ├── src
+│   ├── docker-compose.yml
+│   └── Dockerfile
+│
+└── README.md
 
-### 1. Acesse a pasta do backend
-```bash
-cd backend/
-```
+3. 🚀 Pré-requisitos
+Antes de iniciar, instale:
+•	Node.js (versão LTS 18+)
+•	NPM ou Yarn
+•	Docker + Docker Compose
+•	Git
+•	Expo Go 
+•	Android Studio (para emuladores)
 
-Após isso, crie o arquivo .env, insira os pares chave-valor:
-```text
-# Database
-DB_HOST=postgres
-DB_PORT=5432
-DB_USERNAME= # Por exemplo: postgres
-DB_PASSWORD= # Por exemplo: postgres
-DB_DATABASE=# Por exemplo: solidarios_db
+4. Como Rodar o Projeto
+Abaixo, o passo a passo completo para iniciar toda a aplicação.
 
-# JWT
-JWT_SECRET= # Por exemplo: seu_segredo_jwt_aqui
-JWT_EXPIRATION_TIME= #Por exemplo: 15m
-REFRESH_TOKEN_EXPIRATION_DAYS= #Por exemplo: 7
+4.1 Clonar o Repositório
+git clone https://github.com/RadamesGiona/Sanem.git
+cd Sanem
 
-# App
+4.2 Inicializar Back-end + Banco + MinIO, a forma recomendada é via docker:
+
+1.	Acesse a pasta do back-end:
+cd backend
+3.	Execute o Docker Compose:
+docker-compose up --build
+5.	O Docker irá criar automaticamente:
+o	Container PostgreSQL
+o	Container MinIO
+o	Container NestJS (API)
+6.	As migrations serão executadas automaticamente ao subir o back-end.
+
+4.3 Endpoints e Serviços
+Após subir o ambiente:
+API (NestJS)
+http://localhost:3000
+Swagger (Documentação da API)
+http://localhost:3000/api
+MinIO (Interface Web)
+http://localhost:9001
+Credenciais:
+Usuário: admin
+Senha: supersecret
+
+4.4 Executar o Front-end (React Native)
+1.	Abra um terminal e vá para:
+cd frontend
+3.	Instale as dependências:
+npm install
+7.	Inicie o projeto:
+npx expo start
+9.	O Expo abrirá no navegador.
+Escolha:
+o	Run on Android
+o	Run on iOS
+o	Scan QR Code (rodar no celular)
+
+5. Banco de Dados
+Configuração usada no Docker:
+Host: localhost
+Porta: 5432
+Usuário: postgres
+Senha: postgres
+Banco: solidarios_db
+Local das migrations:
+backend/src/database/migrations
+As migrations criam todas as tabelas automaticamente ao rodar o Docker.
+
+6. Estrutura do Back-end 
+/backend/src
+│
+├── modules/
+│   ├── items/        → módulo de itens
+│   ├── users/        → módulo de usuários
+│   ├── auth/         → autenticação
+│   ├── donations/    → doações
+│   └── shared/       → utilidades
+│
+├── database/
+│   ├── migrations    → versionamento do banco
+│   └── entities      → entidades ORM
+│
+├── main.ts           → bootstrap do NestJS
+└── app.module.ts     → módulo principal
+
+7. Estrutura do Front-end (Resumo para continuação)
+/frontend
+│
+├── src/
+│   ├── services/       → consumo da API
+│   ├── screens/        → telas
+│   ├── components/     → componentes globais
+│   ├── context/        → autenticação e estado global
+│   └── utils/          → funções auxiliares
+│
+├── App.tsx             → entrada da aplicação
+
+
+8. 🔑 Variáveis de Ambiente
+Back-end
+Arquivo .env esperado (utilize como exemplo):
+DATABASE_HOST=postgres
+DATABASE_PORT=5432
+DATABASE_USER=postgres
+DATABASE_PASSWORD=postgres
+DATABASE_NAME=solidarios_db
+
+MINIO_ENDPOINT=minio
+MINIO_ROOT_USER=admin
+MINIO_ROOT_PASSWORD=supersecret
+MINIO_BUCKET_NAME=solidarios
+
 PORT=3000
-```
-
-Agora você pode inserir o seguinte comando para subir o container do banco de dados (com as migrations efetuadas) juntamente com o back-end:
-```bash
-docker compose up -d --build
-```
-
-Após isso, você pode ir direto para a pasta do Front-end
-
-```bash
-cd ../frontend
-```
-
-Na pasta frontend, você pode executar usando:
-```bash
-npm start
-```
-
-**Obs:** Caso não tenha emulador android, você poderá rodar web passando a flag 'w' quando requisitada
-
+Front-end (caso necessário)
+Criar .env:
+API_URL=http://localhost:3000
